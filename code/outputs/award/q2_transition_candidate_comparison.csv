@@ -1,0 +1,7 @@
+﻿transition,evidence,serial,weight,description,time,displacement_mm,velocity_6h_mm_h
+slow_to_accelerated,displacement_trend_change,5290,0.2,Piecewise displacement SSE optimum; marks early curvature change.,2024-06-09 17:30:00.000000000,155.205,0.375
+slow_to_accelerated,sustained_acceleration_onset,8108,0.35,First 12h window where 6h velocity stays above baseline+5MAD.,2024-06-29 07:10:00.000000001,353.923,0.6360000000001378
+slow_to_accelerated,velocity_level_jump,8473,0.45,Velocity-level segmentation optimum; marks significant speed regime jump.,2024-07-01 20:00:00.000000000,415.439,1.206000000000131
+accelerated_to_rapid,displacement_trend_change,8871,0.25,Piecewise displacement SSE optimum.,2024-07-04 14:19:59.999999998,524.386,1.8659999999998718
+accelerated_to_rapid,rapid_velocity_persistence,9567,0.25,First persistent crossing of midpoint between accelerated and rapid velocity levels.,2024-07-09 10:19:59.999999998,826.737,3.96000000000015
+accelerated_to_rapid,velocity_level_jump,9501,0.5,Velocity-level segmentation optimum.,2024-07-08 23:19:59.999999998,785.711,2.7809999999997217

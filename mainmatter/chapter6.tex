@@ -1,0 +1,91 @@
+\chapter{问题四模型与结果：阶段归一化残差预测}
+
+\section{阶段归一化基线}
+
+附件4要求利用训练集规律预测实验集表面位移。由于题目给出了实验集阶段标签，最直接的信息不是绝对时间，而是“同一阶段内的相对演化位置”。本文先在训练集识别阶段，得到两个转换节点：第6396号，时间为2023-06-15 02:30；第8854号，时间为2023-07-02 04:10。
+
+在第$k$阶段内定义
+\begin{equation}
+  \tau_t=\frac{t-t_{k,0}}{t_{k,1}-t_{k,0}},\quad 0\leq \tau_t\leq 1,
+\end{equation}
+并以单调PCHIP拟合阶段基线
+\begin{equation}
+  s_t=B_{k,0}+g_k(\tau_t).
+\end{equation}
+其中$g_k(0)=0$，$g_k(1)$等于该阶段训练集累计位移增量，且通过累积最大约束保证单调。这样可避免直接回归绝对位移时跨阶段尺度混乱的问题。
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{q4_training_stage_baseline.png}
+\caption{问题四训练集阶段归一化基线}
+\label{fig:q4_baseline}
+\end{figure}
+
+\section{扰动残差模型}
+
+阶段基线描述主要蠕变骨架，降雨、孔压、微震和爆破会造成阶段内偏差。对训练集定义残差
+\begin{equation}
+  e_t=s_t-\left(B_{k,0}+g_k(\tau_t)\right),
+\end{equation}
+再构造扰动特征$X_t$，包括当前值、滞后项、滚动统计量、阶段标签、$\tau$以及爆破距离和药量的指数衰减项。残差模型为
+\begin{equation}
+  \hat s_t=B_{k,0}+g_k(\tau_t)+\lambda f_k(X_t),
+\end{equation}
+其中$f_k$为分阶段GBDT残差模型，$\lambda=0.35$为残差收缩系数。最终预测序列通过累计最大投影保证整体单调。
+
+消融实验见表\ref{tab:q4_ablation}。分阶段基线已经显著优于全局直接回归；加入GBDT残差后，时间块交叉验证RMSE降至2.142 mm，是泛化表现最好的模型。
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{问题四模型消融对照}
+\label{tab:q4_ablation}
+\begin{tabular}{lrr}
+\toprule
+模型 & RMSE/mm & MAE/mm \\
+\midrule
+阶段基线+GBDT残差（时间块CV） & 2.142 & 0.860 \\
+阶段基线+线性残差（时间块CV） & 3.256 & 1.564 \\
+阶段归一化基线 & 5.578 & 3.389 \\
+全局扰动直接回归（时间块CV） & 61.345 & 42.913 \\
+分阶段扰动直接回归（时间块CV） & 67.215 & 19.848 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{表4.1预测结果}
+
+实验集从首时刻相对位移开始递推，按给定阶段标签计算$\tau$并代入分阶段模型。表\ref{tab:q4_prediction}给出5个指定时刻的预测值和95\%预测区间。区间宽度在快速阶段明显增大，反映出快速形变阶段的残差不确定性更高。
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{实验集指定时刻表面位移预测（题目表4.1）}
+\label{tab:q4_prediction}
+\begin{tabular}{lrrr}
+\toprule
+时间点 & 阶段 & 预测值/mm & 95\%预测区间/mm \\
+\midrule
+2025-05-09 12:00 & 1 & 5.163 & [4.531,\;5.795] \\
+2025-05-27 08:00 & 2 & 30.767 & [21.259,\;40.276] \\
+2025-06-01 12:00 & 2 & 60.259 & [50.751,\;69.768] \\
+2025-06-03 22:00 & 3 & 383.185 & [367.122,\;399.249] \\
+2025-06-04 01:40 & 3 & 383.697 & [367.634,\;399.760] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+预测区间由阶段残差的时间块验证误差和bootstrap扰动共同确定。第一阶段区间较窄，是因为缓慢形变阶段基线稳定、扰动残差小；第三阶段区间半宽约16.063 mm，明显大于前两阶段，反映快速阶段形变对扰动更敏感。该区间不是形式化装饰，而是用于提示快速阶段预测应保留更高风险冗余。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{q4_experiment_prediction_curve.png}
+\caption{问题四实验集表面位移预测曲线}
+\label{fig:q4_prediction}
+\end{figure}
+
+从图\ref{fig:q4_prediction}可见，预测曲线在阶段转换后斜率显著提高，整体保持单调增长，满足题设“对应阶段变化规律一致”的要求。
+
+\section{与直接回归模型的差异}
+
+全局直接回归把日历时间、阶段和扰动变量同时输入模型，容易在训练集内学习到特定时段的位置关系，一旦实验集时间范围变化，就会出现跨阶段偏移。分阶段直接回归虽引入阶段标签，但仍直接预测绝对位移，无法保证阶段首尾衔接。本文的阶段归一化基线先固定每一阶段的相对形变规律，再让扰动残差只修正局部偏差，因此更符合题目“对应阶段变化规律一致”的设定。

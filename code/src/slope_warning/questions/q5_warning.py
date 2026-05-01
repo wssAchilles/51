@@ -261,6 +261,6 @@ def run() -> dict[str, object]:
     write_csv(events, TABLE_DIR / "q5_warning_events.csv")
     write_csv(sensitivity, TABLE_DIR / "q5_warning_window_sensitivity.csv")
     write_json(summary, MODEL_DIR / "q5_model_summary.json")
-    save_segmentation_plot(df["时间"], displacement, rolling_median(clean_velocity, 36, center=False, min_periods=18), [b1, b2], FIGURE_DIR / "q5_stage_segmentation.png", "Q5 stage division")
-    save_prediction_plot(df["时间"], pred_displacement, FIGURE_DIR / "q5_best_model_displacement_fit.png", "Q5 best variable-combination model", observed=displacement)
+    save_segmentation_plot(df["时间"], displacement, rolling_median(clean_velocity, 36, center=False, min_periods=18), [b1, b2], FIGURE_DIR / "q5_stage_segmentation.png", "问题5：表面位移三阶段划分")
+    save_prediction_plot(df["时间"], pred_displacement, FIGURE_DIR / "q5_best_model_displacement_fit.png", "问题5：最优变量组合模型拟合", observed=displacement)
     return summary

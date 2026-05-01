@@ -1,0 +1,3 @@
+﻿transition,recommended_serial,recommended_time,recommended_displacement_mm,recommended_velocity_6h_mm_h,supporting_evidence_count,note
+slow_to_accelerated,8108,2024-06-29 07:10:00.000000001,353.923,0.6360000000001378,3,Composite decision distinguishes early curvature/onset evidence from significant velocity-level jump.
+accelerated_to_rapid,9501,2024-07-08 23:19:59.999999998,785.711,2.7809999999997217,3,Composite decision distinguishes early curvature/onset evidence from significant velocity-level jump.

@@ -1,0 +1,6 @@
+﻿continuous_hampel_threshold,pore_outliers,deep_outliers,surface_outliers,rain_outliers_q0.995,micro_outliers_q0.995,rain_outliers_q0.997,micro_outliers_q0.997,rain_outliers_q0.999,micro_outliers_q0.999
+3.5,37,29,124,30,0,17,0,6,0
+4.0,16,10,68,30,0,17,0,6,0
+4.5,5,5,36,30,0,17,0,6,0
+5.0,0,4,21,30,0,17,0,6,0
+5.5,0,0,11,30,0,17,0,6,0

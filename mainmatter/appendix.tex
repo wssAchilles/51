@@ -1,6 +1,11 @@
-\chapter{补充内容}
+\chapter{附录：代码复现说明}
 
-这是附录部分的示例文本。您可以在这里添加额外的信息、数据或代码，以补充正文内容。
+本文所有结果由统一脚本自动生成，代码目录为\texttt{code/}。基础求解脚本为\texttt{scripts/run\_all.py}，特等奖增强审查脚本为\texttt{scripts/run\_award\_audit.py}。运行方式为：
 
-\chapter{代码}
-下面是一个简单的Python代码示例：
+\begin{lstlisting}[style=appendixpy]
+uv run python scripts/run_all.py
+uv run python scripts/run_award_audit.py
+uv run python -m compileall src scripts
+\end{lstlisting}
+
+主要输出文件包括：\texttt{code/outputs/tables/}中的各题结果表，\texttt{code/outputs/figures/}中的主图，以及\texttt{code/outputs/award/}中的模型对照、敏感性分析、置信区间和质量报告。正文表格均可由这些CSV文件复现，图件均为中文标注，可直接纳入论文。

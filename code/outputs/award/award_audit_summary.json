@@ -1,0 +1,41 @@
+{
+  "q1": {
+    "best_model": "Huber",
+    "ci_nan_count": 0
+  },
+  "q2": {
+    "recommended": [
+      {
+        "transition": "slow_to_accelerated",
+        "recommended_serial": 8108,
+        "recommended_time": "2024-06-29 07:10:00.000000001",
+        "recommended_displacement_mm": 353.923,
+        "recommended_velocity_6h_mm_h": 0.6360000000001378,
+        "supporting_evidence_count": 3,
+        "note": "Composite decision distinguishes early curvature/onset evidence from significant velocity-level jump."
+      },
+      {
+        "transition": "accelerated_to_rapid",
+        "recommended_serial": 9501,
+        "recommended_time": "2024-07-08 23:19:59.999999998",
+        "recommended_displacement_mm": 785.711,
+        "recommended_velocity_6h_mm_h": 2.7809999999997217,
+        "supporting_evidence_count": 3,
+        "note": "Composite decision distinguishes early curvature/onset evidence from significant velocity-level jump."
+      }
+    ]
+  },
+  "q3": {
+    "best_model": "HistGBDT",
+    "top_factor": "pore"
+  },
+  "q4": {
+    "best_ablation": "baseline_plus_gbdt_residual_CV",
+    "best_training_reconstruction": "baseline_plus_gbdt_residual",
+    "target_interval_max_width": 16.063231460906607
+  },
+  "q5": {
+    "best_combo": "降雨量_mm+孔隙水压力_kPa+微震事件数+爆破点距离_m+单段最大药量_kg",
+    "inverse_warning_count": 34
+  }
+}

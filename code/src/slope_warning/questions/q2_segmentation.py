@@ -89,7 +89,7 @@ def run() -> dict[str, object]:
     }
 
     time = pd.Series(START_TIME + pd.to_timedelta(t_hours, unit="h"))
-    save_segmentation_plot(time, displacement, velocity_6h, [b1, b2], FIGURE_DIR / "q2_segmentation.png", "Q2 velocity-driven three-stage segmentation")
+    save_segmentation_plot(time, displacement, velocity_6h, [b1, b2], FIGURE_DIR / "q2_segmentation.png", "问题2：速度主导的三阶段识别")
     write_csv(break_df, TABLE_DIR / "q2_transition_nodes.csv")
     write_csv(stage_df, TABLE_DIR / "q2_stage_models.csv")
     write_csv(jump_df, TABLE_DIR / "q2_velocity_hampel_diagnostics.csv")
@@ -99,4 +99,3 @@ def run() -> dict[str, object]:
         MODEL_DIR / "q2_noise_vs_transition_criteria.txt",
     )
     return summary
-

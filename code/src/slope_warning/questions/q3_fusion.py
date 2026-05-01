@@ -243,9 +243,8 @@ def run() -> dict[str, object]:
         exp_result["编号"].to_numpy(),
         exp_result["表面位移预测值_mm"].to_numpy(),
         FIGURE_DIR / "q3_experiment_prediction_scatter.png",
-        "Q3 experiment surface displacement prediction",
-        "Serial number",
-        "Predicted surface displacement (mm)",
+        "问题3：实验集表面位移预测散点图",
+        "编号",
+        "表面位移预测值/mm",
     )
     return validation
-

@@ -11,6 +11,7 @@ OUTPUT_DIR = CODE_DIR / "outputs"
 TABLE_DIR = OUTPUT_DIR / "tables"
 FIGURE_DIR = OUTPUT_DIR / "figures"
 MODEL_DIR = OUTPUT_DIR / "models"
+AWARD_DIR = OUTPUT_DIR / "award"
 
 
 ATTACHMENTS = {
@@ -23,6 +24,5 @@ ATTACHMENTS = {
 
 
 def ensure_output_dirs() -> None:
-    for path in (OUTPUT_DIR, TABLE_DIR, FIGURE_DIR, MODEL_DIR):
+    for path in (OUTPUT_DIR, TABLE_DIR, FIGURE_DIR, MODEL_DIR, AWARD_DIR):
         path.mkdir(parents=True, exist_ok=True)
-

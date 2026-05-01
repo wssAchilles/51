@@ -47,7 +47,7 @@
   chapter = {
     format     = \centering\heiti\sihao[1]\bfseries,
     name       = {},
-    number     = \arabic{chapter},
+    number     = \chinese{chapter},
     aftername  = \quad,
     beforeskip = 12bp,
     afterskip  = 12bp,
@@ -135,6 +135,7 @@
 
 % 表格加脚注
 \usepackage{threeparttable}
+\usepackage{booktabs}
 
 % 表格中支持跨行
 \usepackage{multirow}
@@ -207,7 +208,9 @@
 % \addbibresource{ref/refs.bib}
 
 % 定义所有的图片文件在 figures 子目录下
-\graphicspath{{figures/}}
+\graphicspath{{figures/}{code/outputs/figures/}{code/outputs/award/}}
+\setlength{\textfloatsep}{8bp plus 2bp minus 2bp}
+\setlength{\intextsep}{6bp plus 2bp minus 2bp}
 
 % 数学命令
 \makeatletter

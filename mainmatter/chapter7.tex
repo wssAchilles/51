@@ -1,0 +1,114 @@
+\chapter{问题五模型与结果：变量选择和预警机制}
+
+\section{五变量组合筛选}
+
+附件5给出6个候选影响变量：降雨量、孔隙水压力、微震事件数、干湿入渗系数、爆破点距离和单段最大药量。若仅按单模型特征重要性选择，容易受模型偏好影响；因此本文枚举全部6种五变量组合，并用ElasticNet与GBDT分别评价速度RMSE、位移RMSE和区块末端误差。
+
+表\ref{tab:q5_varselect}给出综合排序。GBDT模型更重视位移曲线的非线性拟合，ElasticNet更强调速度趋势的线性稳定性。综合两类模型后，剔除干湿入渗系数的组合排名第一。
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{问题五五变量组合稳定性排序}
+\label{tab:q5_varselect}
+\begin{tabularx}{0.98\textwidth}{Xlrr}
+\toprule
+保留变量 & 剔除变量 & GBDT位移RMSE/mm & 综合得分 \\
+\midrule
+降雨量、孔隙水压力、微震事件数、爆破点距离、单段最大药量 & 干湿入渗系数 & 21.899 & 4.45 \\
+降雨量、孔隙水压力、微震事件数、干湿入渗系数、爆破点距离 & 单段最大药量 & 27.399 & 5.35 \\
+降雨量、孔隙水压力、微震事件数、干湿入渗系数、单段最大药量 & 爆破点距离 & 29.951 & 5.95 \\
+孔隙水压力、微震事件数、干湿入渗系数、爆破点距离、单段最大药量 & 降雨量 & 25.714 & 7.05 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+最终预警变量取
+\[
+  \{\text{降雨量},\text{孔隙水压力},\text{微震事件数},\text{爆破点距离},\text{单段最大药量}\}.
+\]
+其中爆破点距离和单段最大药量共同刻画爆破冲击强度，非爆破时刻取零；孔压承接降雨入渗效应，是解释位移和速度变化的核心状态量。
+
+\section{阶段划分与速度阈值}
+
+对附件5表面位移进行同问题二一致的速度分段，得到表\ref{tab:q5_stage}所示三阶段。快速形变阶段平均速度达到9.388 mm/h，约为第一阶段的6.07倍，为预警阈值提供清晰分级依据。
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{问题五边坡变形阶段划分}
+\label{tab:q5_stage}
+\begin{tabular}{crrr}
+\toprule
+阶段 & 起止编号 & 起止时间 & 平均速度/mm/h \\
+\midrule
+缓慢匀速形变 & 1--4669 & 01-01 16:40--02-03 02:40 & 1.548 \\
+加速形变 & 4670--8843 & 02-03 02:50--03-03 02:20 & 2.018 \\
+快速形变 & 8844--9450 & 03-03 02:30--03-07 07:30 & 9.388 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+预警指标取6 h平滑速度$\tilde v_t$，并设置三级阈值。阈值不是单纯分位数，而是结合阶段速度分布、持续时间和扰动增强条件确定，见表\ref{tab:q5_threshold}。
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{问题五三级预警阈值}
+\label{tab:q5_threshold}
+\begin{tabularx}{0.96\textwidth}{lrrX}
+\toprule
+等级 & 速度阈值/mm/h & 持续条件 & 附加条件 \\
+\midrule
+关注 & 2.980 & 不少于2 h & 进入或接近加速阶段，或多源扰动残差持续为正 \\
+预警 & 6.418 & 不少于2 h & 逆速度序列连续下降，且降雨、孔压、微震至少一项增强 \\
+严重预警 & 9.949 & 不少于6 h & 逆速度外推失稳时间进入24 h窗口，或已处快速形变阶段 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{逆速度预警闭环}
+
+对滑坡快速阶段，速度倒数常用于失稳时间外推\citep{voight1988method}。本文在速度超过预警候选区间时，以滚动窗口拟合
+\begin{equation}
+  \frac{1}{\tilde v_t}=a+bt ,
+\end{equation}
+若$b<0$且拟合$R^2$达到要求，则外推失稳时间为$t_f=-a/b$。该方法不作为唯一判据，而作为严重预警的提前量验证。增强审查中共识别34条逆速度预警记录，集中出现在加速后期和快速阶段，与速度阈值触发时间一致。
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.88\textwidth]{q5_best_model_displacement_fit.png}
+\caption{问题五最优五变量模型位移拟合}
+\label{fig:q5_fit}
+\end{figure}
+
+图\ref{fig:q5_fit}显示，入选变量组合能够较好刻画位移主趋势，尤其在快速形变阶段能跟随速度抬升。这说明最终选择不是单纯基于变量相关性，而是经由位移和速度双目标验证得到。
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{q5_warning_timeline.png}
+\caption{问题五三级预警时间线}
+\label{fig:q5_warning_timeline}
+\end{figure}
+
+图\ref{fig:q5_warning_timeline}显示，关注阈值可在进入快速阶段前给出持续提示，预警和严重预警则随着速度斜率抬升集中触发。与只使用单次超阈值相比，本文预警机制要求“速度超阈值+持续时间+扰动增强+逆速度下降”共同成立，可减少孤立误报。
+
+\section{窗口敏感性}
+
+速度窗口过短会放大噪声，过长会延迟预警。本文比较3 h、6 h和12 h窗口下的阶段速度分位数，见表\ref{tab:q5_window}. 快速阶段中位速度在三种窗口下均约为10 mm/h，说明严重预警阈值稳定；第一阶段90\%分位数在3 h和6 h下约为2.98 mm/h，12 h下略降，说明关注阈值对窗口有一定敏感性，因此需要叠加持续时间条件。
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{问题五速度窗口敏感性}
+\label{tab:q5_window}
+\begin{tabular}{lrrr}
+\toprule
+窗口 & 第一阶段90\%分位 & 第二阶段90\%分位 & 第三阶段50\%分位 \\
+\midrule
+3 h & 2.986 & 3.800 & 10.000 \\
+6 h & 2.980 & 3.780 & 10.001 \\
+12 h & 2.697 & 3.795 & 9.997 \\
+\bottomrule
+\end{tabular}
+\end{table}

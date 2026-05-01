@@ -238,7 +238,7 @@ def run() -> dict[str, object]:
     write_csv(exp_result, TABLE_DIR / "q4_experiment_surface_predictions.csv")
     write_csv(target_df, TABLE_DIR / "q4_table_4_1_predictions.csv")
     write_json(summary, MODEL_DIR / "q4_model_summary.json")
-    save_segmentation_plot(train["时间"], y, velocity_6h, [b1, b2], FIGURE_DIR / "q4_training_segmentation.png", "Q4 training stage segmentation")
-    save_prediction_plot(exp["时间"], exp_pred, FIGURE_DIR / "q4_experiment_prediction_curve.png", "Q4 experiment surface displacement prediction")
-    save_prediction_plot(train["时间"], train_baseline, FIGURE_DIR / "q4_training_stage_baseline.png", "Q4 training stage-normalized baseline", observed=y)
+    save_segmentation_plot(train["时间"], y, velocity_6h, [b1, b2], FIGURE_DIR / "q4_training_segmentation.png", "问题4：训练集三阶段划分")
+    save_prediction_plot(exp["时间"], exp_pred, FIGURE_DIR / "q4_experiment_prediction_curve.png", "问题4：实验集表面位移预测曲线")
+    save_prediction_plot(train["时间"], train_baseline, FIGURE_DIR / "q4_training_stage_baseline.png", "问题4：阶段归一化基线拟合", observed=y)
     return summary

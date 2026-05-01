@@ -1,4 +1,4 @@
-\begin{thebibliography}{0}
+\begin{thebibliography}{4}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{#1}
 \expandafter\ifx\csname urlstyle\endcsname\relax\else
@@ -10,5 +10,27 @@
   \def\doi#1{\href{https://doi.org/#1}{\nolinkurl{#1}}}
   \let\eprint\href
 \fi
+
+\bibitem[Hampel(1974)]{hampel1974influence}
+Hampel F~R.
+\newblock The influence curve and its role in robust estimation\allowbreak[J].
+\newblock Journal of the American Statistical Association, 1974, 69\allowbreak (346): 383-393.
+
+\bibitem[Killick et~al.(2012)Killick, Fearnhead, and Eckley]{killick2012optimal}
+Killick R, Fearnhead P, Eckley I~A.
+\newblock Optimal detection of changepoints with a linear computational cost\allowbreak[J/OL].
+\newblock Journal of the American Statistical Association, 2012, 107\allowbreak (500): 1590-1598.
+\newblock DOI: \doi{10.1080/01621459.2012.737745}.
+
+\bibitem[Friedman(2001)]{friedman2001greedy}
+Friedman J~H.
+\newblock Greedy function approximation: A gradient boosting machine\allowbreak[J].
+\newblock The Annals of Statistics, 2001, 29\allowbreak (5): 1189-1232.
+
+\bibitem[Voight(1988)]{voight1988method}
+Voight B.
+\newblock A method for prediction of volcanic eruptions\allowbreak[J/OL].
+\newblock Nature, 1988, 332: 125-130.
+\newblock DOI: \doi{10.1038/332125a0}.
 
 \end{thebibliography}
