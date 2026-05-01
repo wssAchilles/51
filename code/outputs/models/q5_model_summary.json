@@ -1,0 +1,97 @@
+{
+  "stage_transition_rows": [
+    4670,
+    8844
+  ],
+  "stage_transition_times": [
+    "2024-02-03 02:50:00",
+    "2024-03-03 02:30:00"
+  ],
+  "best_combo": [
+    "降雨量_mm",
+    "孔隙水压力_kPa",
+    "微震事件数",
+    "爆破点距离_m",
+    "单段最大药量_kg"
+  ],
+  "dropped_variable": "干湿入渗系数",
+  "best_combo_metrics": {
+    "variables": "降雨量_mm+孔隙水压力_kPa+微震事件数+爆破点距离_m+单段最大药量_kg",
+    "dropped_variable": "干湿入渗系数",
+    "feature_count": 23,
+    "elasticnet_velocity_RMSE": 3.063269907210986,
+    "elasticnet_velocity_MAE": 2.245060240073241,
+    "elasticnet_displacement_RMSE": 180.65510959341037,
+    "elasticnet_block_end_abs_error": 287.0376885045158,
+    "gbdt_velocity_RMSE": 2.599777635116114,
+    "gbdt_velocity_MAE": 1.7878699689376067,
+    "gbdt_displacement_RMSE": 21.89902309189768,
+    "gbdt_block_end_abs_error": 22.312097603548114,
+    "gbdt_rank_score": 1.3,
+    "elasticnet_rank_score": 5.5
+  },
+  "warning_thresholds": [
+    {
+      "level": "关注",
+      "velocity_threshold_mm_h": 2.9804192337458493,
+      "persistence_requirement": "连续不少于2小时",
+      "extra_condition": "进入或接近加速阶段，或多源扰动残差持续为正"
+    },
+    {
+      "level": "预警",
+      "velocity_threshold_mm_h": 6.417877250316725,
+      "persistence_requirement": "连续不少于2小时",
+      "extra_condition": "逆速度序列连续下降，且降雨/孔压/微震至少一项增强"
+    },
+    {
+      "level": "严重预警",
+      "velocity_threshold_mm_h": 9.94923953738837,
+      "persistence_requirement": "连续不少于6小时",
+      "extra_condition": "逆速度线性外推失稳时间进入24小时窗口，或已处快速形变阶段"
+    }
+  ],
+  "groups": {
+    "stage": [
+      "stage_2",
+      "stage_3"
+    ],
+    "tau": [
+      "tau",
+      "tau2"
+    ],
+    "rain": [
+      "rain",
+      "rain_1h",
+      "rain_6h",
+      "rain_24h"
+    ],
+    "pore": [
+      "pore",
+      "pore_diff",
+      "pore_6h_mean"
+    ],
+    "micro": [
+      "micro",
+      "micro_1h",
+      "micro_6h"
+    ],
+    "blast_distance": [
+      "blast_flag",
+      "blast_inv_distance"
+    ],
+    "blast_charge": [
+      "blast_charge"
+    ],
+    "blast_interaction": [
+      "blast_impulse",
+      "blast_impulse_6h",
+      "blast_impulse_24h"
+    ],
+    "interactions": [
+      "rain24_pore",
+      "pore_micro6",
+      "blast_micro6"
+    ]
+  },
+  "velocity_jump_count": 359
+}

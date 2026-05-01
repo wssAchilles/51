@@ -1,0 +1,181 @@
+{
+  "training_transition_rows": [
+    6396,
+    8854
+  ],
+  "training_transition_times": [
+    "2023-06-15 02:30:00",
+    "2023-07-02 04:10:00"
+  ],
+  "direct_cv": {
+    "global_direct_RMSE_mm": 61.34508573850312,
+    "global_direct_MAE_mm": 42.91298862957749,
+    "staged_direct_RMSE_mm": 67.21518011328043,
+    "staged_direct_MAE_mm": 19.848354604397286
+  },
+  "monotonic_violations_experiment": 0,
+  "target_predictions": [
+    {
+      "时间点": "2025-05-09 12:00:00",
+      "实验集行号": 1125,
+      "阶段标签": 1,
+      "表面位移预测值_mm": 5.1627542885470525
+    },
+    {
+      "时间点": "2025-05-27 08:00:00",
+      "实验集行号": 3693,
+      "阶段标签": 2,
+      "表面位移预测值_mm": 30.76735742646368
+    },
+    {
+      "时间点": "2025-06-01 12:00:00",
+      "实验集行号": 4437,
+      "阶段标签": 2,
+      "表面位移预测值_mm": 60.259424049093376
+    },
+    {
+      "时间点": "2025-06-03 22:00:00",
+      "实验集行号": 4785,
+      "阶段标签": 3,
+      "表面位移预测值_mm": 383.18547525682766
+    },
+    {
+      "时间点": "2025-06-04 01:40:00",
+      "实验集行号": 4807,
+      "阶段标签": 3,
+      "表面位移预测值_mm": 383.69700818330716
+    }
+  ],
+  "residual_models": {
+    "1": {
+      "residual_clip_low": -0.5013857710421684,
+      "residual_clip_high": 0.73995931013934,
+      "feature_importance": {
+        "stage_2": 0.0,
+        "stage_3": 0.0,
+        "tau": 0.19472401050867383,
+        "tau2": 0.24050389177330614,
+        "rain": 0.0,
+        "rain_1h": 0.0,
+        "rain_6h": 0.004184769497413413,
+        "rain_24h": 0.038126694434374796,
+        "pore": 0.00925891042945557,
+        "pore_diff": 0.0017509862765463134,
+        "pore_6h_mean": 0.027389921376795762,
+        "micro": 0.0008243472278440657,
+        "micro_1h": 0.0,
+        "micro_6h": 0.0,
+        "blast_flag": 0.0,
+        "blast_inv_distance": 0.08728354546128055,
+        "blast_charge": 0.08938783587057002,
+        "blast_impulse": 0.20020091835035167,
+        "blast_impulse_6h": 0.020720374162071526,
+        "blast_impulse_24h": 0.02338860410306797,
+        "rain24_pore": 0.007103153989637522,
+        "pore_micro6": 0.009366801655611809,
+        "blast_micro6": 0.04578523488299889
+      }
+    },
+    "2": {
+      "residual_clip_low": 1.8918700921223244,
+      "residual_clip_high": 11.580197612521133,
+      "feature_importance": {
+        "stage_2": 0.0,
+        "stage_3": 0.0,
+        "tau": 0.355112820221435,
+        "tau2": 0.38152782502001004,
+        "rain": 1.596223507119032e-05,
+        "rain_1h": 0.006787942721694334,
+        "rain_6h": 0.043856542140676344,
+        "rain_24h": 0.0027743181167599064,
+        "pore": 0.012071368318191372,
+        "pore_diff": 0.0009269639157516959,
+        "pore_6h_mean": 0.05724135228935065,
+        "micro": 0.00011263003577088433,
+        "micro_1h": 0.00021909894060843883,
+        "micro_6h": 0.001447731701264989,
+        "blast_flag": 0.0,
+        "blast_inv_distance": 0.0,
+        "blast_charge": 0.0,
+        "blast_impulse": 0.0,
+        "blast_impulse_6h": 0.061740593939496526,
+        "blast_impulse_24h": 0.04430907136148058,
+        "rain24_pore": 0.0034635563691305183,
+        "pore_micro6": 0.0037070803449217775,
+        "blast_micro6": 0.024685142328385944
+      }
+    },
+    "3": {
+      "residual_clip_low": -8.161596246005805,
+      "residual_clip_high": 20.700951797084628,
+      "feature_importance": {
+        "stage_2": 0.0,
+        "stage_3": 0.0,
+        "tau": 0.23546774298657183,
+        "tau2": 0.31658854579166307,
+        "rain": 5.976385345668578e-05,
+        "rain_1h": 0.006187398111720289,
+        "rain_6h": 0.009829202435276364,
+        "rain_24h": 0.005653010697076868,
+        "pore": 0.003663619504434576,
+        "pore_diff": 0.001698701831849068,
+        "pore_6h_mean": 0.06876530833755504,
+        "micro": 0.0005892007252906587,
+        "micro_1h": 0.006517984092170612,
+        "micro_6h": 0.009438451055546526,
+        "blast_flag": 0.0,
+        "blast_inv_distance": 0.0,
+        "blast_charge": 0.0,
+        "blast_impulse": 0.0,
+        "blast_impulse_6h": 0.0437355867779367,
+        "blast_impulse_24h": 0.073124572803612,
+        "rain24_pore": 0.021039010786776856,
+        "pore_micro6": 0.01149423671509229,
+        "blast_micro6": 0.1861476634939706
+      }
+    }
+  },
+  "groups": {
+    "stage": [
+      "stage_2",
+      "stage_3"
+    ],
+    "tau": [
+      "tau",
+      "tau2"
+    ],
+    "rain": [
+      "rain",
+      "rain_1h",
+      "rain_6h",
+      "rain_24h"
+    ],
+    "pore": [
+      "pore",
+      "pore_diff",
+      "pore_6h_mean"
+    ],
+    "micro": [
+      "micro",
+      "micro_1h",
+      "micro_6h"
+    ],
+    "blast_distance": [
+      "blast_flag",
+      "blast_inv_distance"
+    ],
+    "blast_charge": [
+      "blast_charge"
+    ],
+    "blast_interaction": [
+      "blast_impulse",
+      "blast_impulse_6h",
+      "blast_impulse_24h"
+    ],
+    "interactions": [
+      "rain24_pore",
+      "pore_micro6",
+      "blast_micro6"
+    ]
+  }
+}

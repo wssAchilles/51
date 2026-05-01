@@ -1,0 +1,148 @@
+《大数据与云计算（Q）》
+
+       实验报告
+
+    实验三 Hadoop 分布式搭建
+
+
+
+
+   学   院   计算机信息工程学院
+
+   班   级     23 软一
+
+   学   号    23030327
+
+   姓   名     许子祺
+                     实验三 Hadoop 分布式搭建
+ 一、实验目的
+   掌握 Hadoop 完全分布式环境的搭建过程，包括克隆节点、配置运行环境等。学会进
+行集群配置，理解 SSH 免密登录的原理，并能在本机上生成公钥和私钥，实现所有机器的
+免密码登录。
+   掌握 docker cp 的使用，能进行远程复制操作。能够编写集群文件复制脚本，实现集
+群配置文件的同步。
+   学会集群规划，包括 HDFS 和 YARN 的配置，并能将配置好的集群配置文件进行同步。
+通过测试集群，包括配置 slaves、格式化 namenode 元数据、进行集群数据同步、启动集
+群 HDFS 命令、启动集群 YRAN 命令，并通过网页查看集群状态。
+   Hadoop 完全分布式环境的搭建涉及多个步骤和技术细节。理解并准确执行这些步骤对
+于成功部署和管理一个 Hadoop 集群至关重要。通过上述步骤，可以建立一个高效、可靠
+的 Hadoop 集群，为处理大规模数据集提供强大的支持。
+
+ 二、实验环境
+   1. 操作系统：多个 Ubuntu24.04.4LTS 节点（建议至少 3 个节点：1 个 NameNode，3
+      个 DataNode）。
+   2. JDK：每个节点都需要安装 JDK1.8 或更高版本。
+   3. Hadoop：每个节点上安装相同版本的 Hadoop，如 Hadoop3.4.3。
+   4. OpenSSHServer：确保每个节点都已安装，用于 SSH 免密登录。
+
+ 三、实验内容
+   本实验的内容主要包括以下几个方面：
+   1.克隆两台 slave 节点，并进行相应的配置修改，使用 VMwareworkstation16Pro 来复制
+现有 Slave 节点的系统配置和 Hadoop 设置到新节点上。针对每个新克隆的 slave 节点，更新
+其网络配置（如 IP 地址、子网掩码、网关等），并确保 Hadoop 的配置文件(比如 core-site.xml、
+hdfs-site.xml、mapred-site.xml 和 yarn-site.xml)在每个节点上都有相应的同步和更新，
+以识别新的节点加入集群。
+   2.集群时间同步，时间同步的方式：指定一台服务器为时间同步服务器，其它机器与它的
+时间进行同步。
+   3.通过 SSH 免密登录原理，包括.ssh 使用，在本机上生成公钥和私钥，免密登录原理，
+所有的机器配置免密码登录。使用 ssh-keygen 生成密钥对，然后将公钥添加到各个节点的
+authorized_keys 文件中。简化和加速节点间的操作，特别是从主节点到其他节点的指令执行，
+无需反复输入密码。
+   4.通过 docker cp 复制。通过编写集群文件复制脚本，包括创建脚本目录、编写集群复制
+的脚本、测试。在节点间高效地传输文件和目录，将 Hadoop 的配置文件从主节点复制到所有
+Slave 节点。
+   5.编写集群文件复制脚本，实现集群配置文件的同步。脚本应包括对所有目标节点的遍历，
+并能处理配置文件的任何改动。自动化配置文件的同步过程，避免手动错误，提高效率。
+   6.集群规划，通过配置集群，包括 HDFS 配置、YARN 配置、把配置好的集群配置文件进行
+同步。创建一个脚本，用 docker cp 命令同步配置文件到各节点。配置 hdfs-site.xml、
+core-site.xml、mapred-site.xml 和 yarn-site.xml 等文件，反映集群的物理布局和容量配置。
+   8.通过测试集群，包括配置 slaves、第一次启动集群格式化 namenode 元数据、进行集群
+数据同步、启动集群 HDFS 命令、启动集群 YRAN 命令、通过网页查看。配置 HDFS 和 YARN，启
+动 Hadoop 集群，并通过网页查看集群状态，完成 Hadoop 集群的配置和部署，确保其可以正常
+工作，通过 Web 界面监控集群状态。
+
+ 四、实验预习和准备
+   为了进行 Hadoop 完全分布式安装实验，需要完成以下预习和准备工作：
+   1.Hadoop 基础知识，了解 Hadoop 的基本概念、架构和组件，包括 HDFS（Hadoop 分布式文
+件系统）和 YARN（YetAnotherResourceNegotiator）。理解它们的作用和工作原理，以及在大
+数据处理中的重要性。
+   2.集群规划和管理，熟悉集群规划和管理的基本概念和方法。了解如何根据需求选择合适
+的硬件配置和网络拓扑结构，以及如何进行节点管理和故障排除。
+   3.SSH 免密登录，了解 SSH 免密登录的原理和配置方法。掌握如何在本机上生成公钥和私
+钥，以及如何将公钥复制到其他机器上实现免密码登录。
+   4.文件传输工具，熟悉 docker cp 命令的使用，了解它们的特点和适用场景。
+   5.脚本编写，具备基本的 Shell 脚本编写能力，能够编写简单的脚本来完成集群文件复制
+等任务。
+   6.集群配置文件，了解 Hadoop 集群配置文件的结构和参数设置，包括 core-site.xml、
+hdfs-site.xml 和 yarn-site.xml 等。
+   7.Web 界面操作，熟悉 Hadoop Web 界面的使用，了解如何查看集群状态、管理作业和监控
+资源使用情况。
+
+ 五、实验过程与结果
+1.创建 Hadoop 实验专用 Docker 网络
+
+
+
+
+2.创建 3 个 Ubuntu 容器节点
+3.进入 master 容器，安装基础工具。
+
+
+
+
+4.配置三个容器的 /etc/hosts
+
+
+
+
+5.配置 SSH 服务和 root 密码
+6.配置 master 到 slave1 / slave2 的 SSH 免密登录
+
+
+
+
+7.配置 master 的 Hadoop 环境变量
+8.配置 Hadoop 核心配置文件
+
+
+
+
+9.配置 YARN 和 MapReduce
+10.启动 HDFS 集群
+
+
+
+
+11.检查 HDFS 的 DataNodes 页面
+
+
+
+
+12.启动 YARN 集群
+13.打开 YARN Web 页面验证
+
+
+
+
+14.HDFS 文件上传与读取测试
+
+
+
+
+15.运行 Hadoop 示例任务 WordCount
+ 六、实验结果分析与体会
+   本次实验基于 Docker 容器模拟了 Hadoop 完全分布式集群环境，创建了 master、
+slave1、slave2 三个 Ubuntu 节点。其中 master 节点承担 NameNode、SecondaryNameNode
+和 ResourceManager 角色，slave1、slave2 节点承担 DataNode 和 NodeManager 角色。
+实验过程中完成了节点网络配置、SSH 免密登录、JDK 与 Hadoop 安装、HDFS 和 YARN
+配置、配置文件同步、NameNode 格式化以及集群启动等操作。通过 jps 命令可以看到各
+节点进程正常运行，HDFS Web 页面显示两个 DataNode 在线，YARN Web 页面显示
+Active Nodes: 2，说明 Hadoop 集群搭建成功。
+   在功能验证阶段，成功将测试文件上传到 HDFS，并通过 hdfs dfs -cat 正确读取文件
+内容，说明 HDFS 文件存储与读取功能正常。随后运行 Hadoop 自带的 WordCount 示
+例程序，任务最终显示 map 100% reduce 100%，并生成 /output/part-r-00000 结果文件，
+输出 cluster、distributed、hadoop、hello 等单词统计结果，说明 MapReduce 任务能够通
+过 YARN 正常提交和执行。通过本次实验，我进一步理解了 Hadoop 中 NameNode、
+DataNode、ResourceManager 和 NodeManager 的作用，也认识到 SSH 免密登录、环境变
+量配置和配置文件同步在分布式集群部署中的重要性。
+

@@ -1,0 +1,27 @@
+\documentclass[fontset=mac,output=electronic]{thuthesis}
+\input{thusetup}
+
+\begin{document}
+\input{frontmatter/cover}
+\input{frontmatter/abstract}
+
+\frontmatter
+%\tableofcontents
+
+%\listoffigures           % 插图清单
+%\listoftables            % 表格清单
+
+\mainmatter
+\input{mainmatter/chapter1}
+\input{mainmatter/chapter2}
+\input{mainmatter/chapter3}
+\input{mainmatter/chapter4}
+\input{mainmatter/chapter5}
+
+% 参考文献
+% 正文使用 \citep 或 \citet 后，再启用下一行。
+% \bibliography{ref/refs}  % 仅列出正文中实际引用的文献
+
+\appendix
+\input{mainmatter/appendix}
+\end{document}

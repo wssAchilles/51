@@ -1,0 +1,4 @@
+A real transition must persist beyond one smoothing window and shift the velocity level.
+The post-node smoothed acceleration trend cannot immediately revert to the prior level.
+The three-stage segmented cost must drop sharply versus one-stage velocity cost.
+Single-point Hampel velocity spikes are treated as noise/engineering disturbance, not stage transition.

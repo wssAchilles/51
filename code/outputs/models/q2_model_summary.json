@@ -1,0 +1,83 @@
+{
+  "method": "Hampel velocity cleaning + 6h trailing median velocity + two-break constant-mean dynamic programming",
+  "break_indices_0_based": [
+    8472,
+    9500
+  ],
+  "break_serial_numbers": [
+    8473,
+    9501
+  ],
+  "break_times": [
+    "2024-07-01 20:00:00",
+    "2024-07-08 23:19:59.999999998"
+  ],
+  "velocity_segmentation_sse": 1645.6270928674994,
+  "displacement_piecewise_linear_breaks_for_validation": [
+    5290,
+    8871
+  ],
+  "displacement_piecewise_linear_sse_for_validation": 5357560.559145801,
+  "velocity_sse_all": 19727.88572078994,
+  "velocity_sse_three_stage": 1645.6270928674103,
+  "instant_jump_count": 458,
+  "stage_models": [
+    {
+      "stage": 1,
+      "start": 1,
+      "end": 8472,
+      "duration_h": 1411.8333333333333,
+      "displacement_start": 0.059,
+      "displacement_end": 415.171,
+      "avg_velocity": 0.2940233738637705,
+      "model": "degree_3_polynomial",
+      "degree": 3,
+      "coefficients": "1.953851317e-08;0.0001475314187;0.03150217391;-1.241071486",
+      "rmse": 2.6398971576555748,
+      "r2": 0.9994778424469012,
+      "bic": 16484.395986156145,
+      "start_time": "2024-05-04 00:00:00",
+      "end_time": "2024-07-01 19:49:59.999999998"
+    },
+    {
+      "stage": 2,
+      "start": 8473,
+      "end": 9500,
+      "duration_h": 171.16666666666666,
+      "displacement_start": 415.439,
+      "displacement_end": 785.13,
+      "avg_velocity": 2.1598305744888022,
+      "model": "degree_2_polynomial",
+      "degree": 2,
+      "coefficients": "0.00496363121;1.310411339;415.4884042",
+      "rmse": 0.42195115796576144,
+      "r2": 0.9999845604301518,
+      "bic": -1753.2457906055818,
+      "start_time": "2024-07-01 20:00:00",
+      "end_time": "2024-07-08 23:10:00.000000001"
+    },
+    {
+      "stage": 3,
+      "start": 9501,
+      "end": 10000,
+      "duration_h": 83.16666666666667,
+      "displacement_start": 785.711,
+      "displacement_end": 1304.153,
+      "avg_velocity": 6.233771543086172,
+      "model": "degree_3_polynomial",
+      "degree": 3,
+      "coefficients": "-0.000455772247;0.0752286539;3.098813401;784.4583683",
+      "rmse": 1.4218415370542252,
+      "r2": 0.9999181185931277,
+      "bic": 376.8113208944832,
+      "start_time": "2024-07-08 23:19:59.999999998",
+      "end_time": "2024-07-12 10:30:00"
+    }
+  ],
+  "core_criteria": [
+    "A real transition must persist beyond one smoothing window and shift the velocity level.",
+    "The post-node smoothed acceleration trend cannot immediately revert to the prior level.",
+    "The three-stage segmented cost must drop sharply versus one-stage velocity cost.",
+    "Single-point Hampel velocity spikes are treated as noise/engineering disturbance, not stage transition."
+  ]
+}
