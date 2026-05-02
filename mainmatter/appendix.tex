@@ -84,13 +84,34 @@ uv run pytest
 问题一 & \path{q1_table_1_1.csv}，\path{q1_model_comparison.csv}，\path{q1_bootstrap_correction_ci.csv} & 校准模型对照、5个待校正值、bootstrap置信区间。 \\
 问题二 & \path{q2_final_transition_decision.csv}，\path{q2_final_stage_models.csv}，\path{q2_transition_candidate_comparison.csv} & 复合证据主节点、候选节点解释、分阶段位移模型。 \\
 问题三 & \path{q3_table_3_1_single_variable_anomalies.csv}，\path{q3_table_3_2_common_anomalies.csv}，\path{q3_experiment_surface_predictions.csv} & 异常点统计、共同异常清单、实验集表面位移估计。 \\
-问题四 & \path{q4_table_4_1_predictions.csv}，\path{q4_table_4_1_prediction_intervals.csv}，\path{q4_ablation_comparison.csv} & 指定时刻预测值、95\%预测区间、模型消融对照。 \\
+问题四 & \path{q4_table_4_1_predictions.csv}，\path{q4_table_4_1_prediction_intervals.csv}，\path{q4_ablation_comparison.csv} & 指定时刻预测值、近似95\%经验预测区间、模型消融对照。 \\
 问题五 & \path{q5_variable_combination_cv.csv}，\path{q5_warning_thresholds.csv}，\path{q5_warning_events.csv} & 六选五组合评价、三级阈值、预警事件时间线。 \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-问题二同时保留了速度水平跃迁的基线输出\path{q2_transition_nodes.csv}，用于与复合证据节点对照。正文采用\path{outputs/award/}中的复合证据主节点：第8108号和第9501号；速度跃迁点第8473号作为第一阶段转换的辅助证据，而非正文最终阶段起点。
+问题二同时保留了速度水平跃迁的基线输出\path{q2_transition_nodes.csv}，用于与复合证据节点对照。正文采用\path{outputs/award/}中的复合证据主节点：第8108号和第9501号；速度跃迁点第8473号作为第一阶段转换的参考节点，而非正文最终阶段起点。
+
+\section{公式与代码口径说明}
+
+为避免正文公式与程序实现产生口径差异，表\ref{tab:appendix_formula_code_map}列出关键建模公式及其对应代码位置。正文数值均以这些实现为准。
+
+\begin{table}[H]
+\centering
+\small
+\caption{关键公式与代码实现口径对应表}
+\label{tab:appendix_formula_code_map}
+\begin{tabularx}{0.98\textwidth}{L{2.4cm}X X}
+\toprule
+建模环节 & 正文口径 & 对应代码位置 \\
+\midrule
+爆破冲击 & $I_t=q_t/(d_t+0.5)^2$；非爆破时刻$q_t=0$，并构造6 h、24 h滞后衰减特征 & \path{src/slope_warning/common/features.py}中的\texttt{blast\_impulse}和\texttt{exp\_decay} \\
+残差收缩 & 问题四主模型使用$\lambda=0.80$，主验证指标为时间块CV后单调投影RMSE & \path{src/slope_warning/questions/q4_prediction.py}与\path{outputs/tables/q4_residual_shrinkage_cv.csv} \\
+逆速度窗口 & 最近24 h窗口，即144个10 min采样点；有效样本不少于窗口三分之一，$R^2\ge0.55$且$b<0$ & \path{src/slope_warning/common/diagnostics.py}和\path{src/slope_warning/award/q5.py} \\
+三级阈值 & $\theta_1,\theta_2,\theta_3$由6 h平滑速度的阶段分位数、最小等级间隔和持续时间条件共同确定 & \path{src/slope_warning/questions/q5_warning.py}与\path{outputs/tables/q5_warning_thresholds.csv} \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \chapter{关键结果附表}
 
@@ -132,6 +153,22 @@ uv run pytest
 加速$\to$快速 & 速度水平跃迁 & 9501 & 0.50 & 07-08 23:20 & 速度水平分段最优。 \\
 \bottomrule
 \end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\caption{问题二分阶段多项式阶数BIC对照}
+\label{tab:appendix_q2_bic}
+\begin{tabular}{L{2.4cm}L{2.0cm}L{2.0cm}L{2.0cm}L{1.8cm}}
+\toprule
+阶段 & 一次BIC & 二次BIC & 三次BIC & 选择阶数 \\
+\midrule
+缓慢匀速形变 & 52008.8 & -7846.0 & -8847.5 & 三次 \\
+加速形变 & 8351.7 & -2064.4 & -2057.9 & 二次 \\
+快速形变 & 2394.7 & 1664.1 & 376.8 & 三次 \\
+\bottomrule
+\end{tabular}
 \end{table}
 
 \section{问题三实验集表面位移估计节选}

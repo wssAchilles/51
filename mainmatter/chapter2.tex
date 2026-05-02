@@ -20,18 +20,22 @@
 \small
 \caption{主要符号说明}
 \label{tab:symbols}
-\begin{tabularx}{0.92\textwidth}{L{2.2cm}X}
+\begin{tabularx}{0.94\textwidth}{L{2.4cm}X}
 \toprule
 符号 & 含义 \\
 \midrule
 $x_i,y_i$ & 问题一中校正前、校正后的位移数据，单位为mm \\
 $s_t$ & $t$时刻表面位移，单位为mm \\
-$v_t,\tilde v_t$ & 差分速度与平滑速度，本文主要使用6 h滚动中位速度，单位为mm/h \\
+$v_t,\tilde v_t,\bar v_t$ & 差分速度、平滑速度与滚动中位速度，本文主要使用6 h滚动中位速度，单位为mm/h \\
+$a_t$ & 平滑速度差分，用于刻画持续加速度趋势 \\
 $T_1,T_2$ & 三阶段模型中的两个阶段转换节点 \\
 $\tau$ & 阶段内归一化时间，$\tau\in[0,1]$ \\
 $g_k(\tau)$ & 第$k$阶段的单调位移基线函数 \\
 $X_t$ & 降雨、孔压、微震、爆破距离和药量等扰动特征向量 \\
 $r_t$ & 多源扰动对阶段基线的残差修正量 \\
+$\lambda$ & 问题四残差收缩系数，用于控制扰动残差修正强度 \\
+$I_t,d_\epsilon$ & 爆破冲击强度与距离平滑常数，本文取$d_\epsilon=0.5$ \\
+$\theta_1,\theta_2,\theta_3$ & 问题五关注、预警和严重预警三级速度阈值 \\
 $\hat t_f$ & 由逆速度法外推得到的潜在失稳时间 \\
 \bottomrule
 \end{tabularx}
@@ -104,11 +108,11 @@ $\hat t_f$ & 由逆速度法外推得到的潜在失稳时间 \\
   R_t^{(w)}=\sum_{j=0}^{w-1}r_{t-j},\quad
   \Delta p_t=p_t-p_{t-1}.
 \end{equation}
-对爆破扰动，设药量为$q_t$、爆破点距离为$d_t$，构造衰减冲击项
+对爆破扰动，设药量为$q_t$、爆破点距离为$d_t$，构造反距离平方衰减冲击项
 \begin{equation}
-  I_t=q_t\exp(-d_t/d_0),
+  I_t=\frac{q_t}{(d_t+d_\epsilon)^2},\quad d_\epsilon=0.5 .
 \end{equation}
-其中$d_0$由训练集尺度确定，非爆破时刻$q_t=0$。
+其中$d_\epsilon$用于避免近零距离导致冲击项奇异，非爆破时刻$q_t=0$。在进入预测和预警模型时，进一步对$I_t$构造6 h和24 h指数滞后衰减特征，以刻画爆破扰动的短时延续效应。
 
 校准和预测类问题采用RMSE、MAE和P95AE：
 \begin{equation}
