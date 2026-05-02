@@ -7,17 +7,17 @@
 \begin{table}[H]
 \centering
 \footnotesize
-\caption{模型稳健性证据汇总}
-\label{tab:robust_summary}
-\begin{tabularx}{0.98\textwidth}{C{1.0cm}X X}
+\caption{关键参数稳健性总表}
+\label{tab:key_parameter_robustness}
+\begin{tabularx}{0.98\textwidth}{L{1.0cm}L{2.4cm}L{2.6cm}X}
 \toprule
-问题 & 主模型 & 稳健性证据 \\
+问题 & 参数 & 推荐值 & 参数来源与稳定性证据 \\
 \midrule
-1 & Huber稳健仿射校准 & OLS、RANSAC、Theil--Sen对照；时间块CV；bootstrap区间稳定 \\
-2 & 复合证据阶段识别 & 位移趋势、持续加速度、速度跃迁三证据互证；3 h/6 h/12 h窗口敏感性检查 \\
-3 & 变量专属异常识别 & 连续变量与稀疏驱动量分开处理；阈值3.5--5.5敏感性平滑 \\
-4 & 阶段归一化基线+残差 & 消融实验证明分阶段基线优于全局直接回归；实验集预测单调 \\
-5 & 五变量组合+速度预警 & 枚举全部六选五组合；阈值严格递增；逆速度事件集中于快速阶段 \\
+1 & Huber阈值$\delta$ & $1.345\sigma$ & $\{1.0,1.2,1.345,1.6,2.0\}\sigma$网格下CV MAE均约1.289 mm，主模型维持经典Huber取值 \\
+2 & 复合证据权重 & $0.20/0.35/0.45$，$0.25/0.25/0.50$ & 位移趋势、持续加速度、速度跃迁三证据融合；权重网格下两主节点稳定比例均为0.84 \\
+3 & 连续量阈值、稀疏量分位 & $4.5$，$0.997$ & 连续状态量用Hampel残差阈值，降雨和微震用事件型分位阈值；异常数量随阈值平滑变化 \\
+4 & 残差收缩系数$\lambda$ & $0.80$ & $\{0,0.20,0.35,0.50,0.65,0.80,1.00\}$时间块CV选择；单调投影后RMSE为2.234 mm且无单调违背 \\
+5 & 速度平滑窗口与三级阈值 & 6 h；2.980/6.418/9.949 & 3 h、6 h、12 h窗口敏感性检查；叠加持续时间和逆速度下降趋势，避免单点误报 \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -31,14 +31,32 @@
 
 图\ref{fig:model_sensitivity_summary}说明：问题二第二速度跃迁点在不同窗口下完全稳定，第一速度跃迁点仅在小范围内波动；问题五严重预警速度候选值在不同窗口下接近10 mm/h。因而本文把第二阶段节点和严重预警阈值视为高稳定结论，对第一阶段起点和关注阈值则采用复合证据与持续时间条件增强稳健性。
 
-\section{优缺点、推广与改进}
+\section{模型合理性分析与推广}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{关键建模选择的合理性说明}
+\label{tab:model_rationality}
+\begin{tabularx}{0.98\textwidth}{X X}
+\toprule
+建模环节 & 合理性说明 \\
+\midrule
+传感器校准 & 两传感器测量同一物理量，仿射误差具有明确量测含义；Huber模型在多模型对照中CV MAE最小，可降低异常点对校准结果的影响。 \\
+阶段识别 & 位移趋势用于刻画累计形变拐点，速度跃迁用于刻画状态突变，持续加速度用于刻画风险提前量；三类证据融合比单一位移分段更稳定。 \\
+异常处理 & 降雨和微震属于稀疏驱动量，其峰值往往具有真实工程含义；本文仅对极端事件进行标记，避免把诱发因素误处理为普通噪声。 \\
+位移预测 & 阶段归一化基线描述边坡蠕变的主形态，残差模型只修正多源扰动造成的局部偏差，从结构上保证预测曲线具有单调工程含义。 \\
+预警机制 & 三级预警不只依赖单次超阈值，而是综合速度阈值、持续时间、多源扰动增强和逆速度趋势，使预警结果更适合工程处置。 \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \begin{table}[H]
 \centering
 \footnotesize
 \caption{模型优缺点与推广条件}
 \label{tab:model_pros_cons}
-\begin{tabularx}{0.98\textwidth}{C{2.0cm}X X}
+\begin{tabularx}{0.98\textwidth}{L{2.0cm}X X}
 \toprule
 方面 & 优点 & 局限及推广时需重校准内容 \\
 \midrule

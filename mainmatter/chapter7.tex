@@ -14,11 +14,11 @@
 \begin{equation}
   \hat s_t(S)=s_1+\frac{1}{6}\sum_{j=2}^{t}\hat v_j(S).
 \end{equation}
-组合评价同时考虑速度和位移：
+组合评价同时考虑速度和位移，并分别保留非线性模型与线性模型的排序。设$R_G(S)$为GBDT下位移RMSE和速度RMSE的名次和，$R_E(S)$为ElasticNet下对应名次和，则共识得分定义为
 \begin{equation}
-  J(S)=\operatorname{rank}\{\mathrm{RMSE}_s(S)\}+0.3\operatorname{rank}\{\mathrm{RMSE}_v(S)\}.
+  J_c(S)=0.65R_G(S)+0.35R_E(S).
 \end{equation}
-位移误差权重更高，因为题目关注边坡变形预测；速度误差作为预警指标，权重保留但不过度主导。
+其中GBDT权重较高，是因为问题三和问题四均表明边坡位移对孔压、降雨和爆破扰动存在明显非线性响应；ElasticNet用于保留线性稳定性约束，防止变量选择完全受单一树模型影响。
 
 表\ref{tab:q5_varselect}给出综合排序。GBDT模型更重视位移曲线的非线性拟合，ElasticNet更强调速度趋势的线性稳定性。综合两类模型后，剔除干湿入渗系数的组合排名第一。
 
@@ -27,7 +27,7 @@
 \small
 \caption{问题五五变量组合稳定性排序}
 \label{tab:q5_varselect}
-\begin{tabularx}{0.98\textwidth}{Xlrr}
+\begin{tabular}{L{5.7cm}L{2.2cm}L{2.5cm}L{1.8cm}}
 \toprule
 保留变量 & 剔除变量 & GBDT位移RMSE/mm & 综合得分 \\
 \midrule
@@ -36,8 +36,10 @@
 降雨量、孔隙水压力、微震事件数、干湿入渗系数、单段最大药量 & 爆破点距离 & 29.951 & 5.95 \\
 孔隙水压力、微震事件数、干湿入渗系数、爆破点距离、单段最大药量 & 降雨量 & 25.714 & 7.05 \\
 \bottomrule
-\end{tabularx}
+\end{tabular}
 \end{table}
+
+两类模型对个别组合存在排序差异：ElasticNet更倾向保留干湿入渗系数并弱化孔压变量，而GBDT在位移积分误差上明显支持保留孔隙水压力并剔除干湿入渗系数。结合问题三贡献排序可知，孔压是降雨入渗后影响位移的核心状态量；干湿入渗系数在附件5中更多体现为经验型衍生变量，与降雨和孔压信息存在重叠。因此最终采用共识得分第一的组合，而不是只依据某一个模型的单项最优结果。
 
 最终预警变量取
 \[
@@ -54,7 +56,7 @@
 \small
 \caption{问题五边坡变形阶段划分}
 \label{tab:q5_stage}
-\begin{tabular}{crrr}
+\begin{tabular}{llll}
 \toprule
 阶段 & 起止编号 & 起止时间 & 平均速度/mm/h \\
 \midrule
@@ -74,7 +76,7 @@
 \small
 \caption{问题五三级预警阈值}
 \label{tab:q5_threshold}
-\begin{tabularx}{0.96\textwidth}{lrrX}
+\begin{tabularx}{0.96\textwidth}{L{1.8cm}L{2.2cm}L{2.0cm}X}
 \toprule
 等级 & 速度阈值/mm/h & 持续条件 & 附加条件 \\
 \midrule
@@ -91,7 +93,7 @@
 \begin{equation}
   \frac{1}{\tilde v_t}=a+bt ,
 \end{equation}
-若$b<0$且拟合$R^2$达到要求，则外推失稳时间为$t_f=-a/b$。该方法不作为唯一判据，而作为严重预警的提前量验证。增强审查中共识别34条逆速度预警记录，集中出现在加速后期和快速阶段，与速度阈值触发时间一致。
+若$b<0$且拟合$R^2$达到要求，则外推失稳时间为$t_f=-a/b$。该方法不作为唯一判据，而作为严重预警的提前量验证。稳健性检验中共识别34条逆速度预警记录，集中出现在加速后期和快速阶段，与速度阈值触发时间一致。
 
 \begin{figure}[htbp]
 \centering
@@ -145,7 +147,7 @@
 \small
 \caption{问题五速度窗口敏感性}
 \label{tab:q5_window}
-\begin{tabular}{lrrr}
+\begin{tabular}{llll}
 \toprule
 窗口 & 第一阶段90\%分位 & 第二阶段90\%分位 & 第三阶段50\%分位 \\
 \midrule

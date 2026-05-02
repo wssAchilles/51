@@ -6,13 +6,14 @@ from scipy.interpolate import PchipInterpolator
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
+from slope_warning.common.diagnostics import monotonic_violations
 from slope_warning.common.features import make_disturbance_features
 from slope_warning.common.io import read_excel, write_csv, write_json
 from slope_warning.common.metrics import time_block_folds
 from slope_warning.common.plotting import save_prediction_plot, save_segmentation_plot
 from slope_warning.common.preprocessing import hampel_replace, rolling_median
 from slope_warning.common.segmentation import fit_stage_polynomial, two_breaks_piecewise_linear
-from slope_warning.config import ATTACHMENTS, FIGURE_DIR, MODEL_DIR, TABLE_DIR
+from slope_warning.config import ATTACHMENTS, AUDIT_CONFIG, FIGURE_DIR, MODEL_DIR, TABLE_DIR
 
 
 TARGET_TIMES = pd.to_datetime(
@@ -118,6 +119,67 @@ def _direct_cv(features: pd.DataFrame, y: np.ndarray, stage: np.ndarray) -> dict
     }
 
 
+def _project_stagewise_monotone(
+    values: np.ndarray,
+    lower_bound: np.ndarray | None = None,
+    stage: np.ndarray | None = None,
+) -> np.ndarray:
+    projected = np.asarray(values, dtype=float).copy()
+    stage_values = np.ones(len(projected), dtype=int) if stage is None else np.asarray(stage, dtype=int)
+    lower = None if lower_bound is None else np.asarray(lower_bound, dtype=float)
+    for label in sorted(np.unique(stage_values)):
+        idx = np.where((stage_values == label) & np.isfinite(projected))[0]
+        if len(idx) == 0:
+            continue
+        stage_pred = projected[idx]
+        if lower is not None:
+            stage_pred = np.maximum(stage_pred, lower[idx])
+        projected[idx] = np.maximum.accumulate(stage_pred)
+
+    finite = np.isfinite(projected)
+    if finite.any():
+        projected[finite] = np.maximum.accumulate(projected[finite])
+    return projected
+
+
+def _residual_shrinkage_cv(
+    features: pd.DataFrame,
+    y: np.ndarray,
+    stage: np.ndarray,
+    baseline: np.ndarray,
+    residual: np.ndarray,
+) -> pd.DataFrame:
+    rows = []
+    for shrinkage in AUDIT_CONFIG.q4_residual_shrinkage_grid:
+        cv_pred = np.full_like(y, np.nan, dtype=float)
+        for label in sorted(np.unique(stage)):
+            idx = np.where(stage == label)[0]
+            for test_idx_local in time_block_folds(len(idx), 3):
+                test_idx = idx[test_idx_local]
+                train_idx = np.setdiff1d(idx, test_idx, assume_unique=True)
+                model = _gbdt()
+                model.fit(features.iloc[train_idx], residual[train_idx])
+                cv_pred[test_idx] = baseline[test_idx] + shrinkage * model.predict(features.iloc[test_idx])
+        mask = np.isfinite(cv_pred)
+        projected = _project_stagewise_monotone(cv_pred, lower_bound=baseline, stage=stage)
+        projected_mask = np.isfinite(projected)
+        rows.append(
+            {
+                "shrinkage": float(shrinkage),
+                "raw_RMSE_mm": float(mean_squared_error(y[mask], cv_pred[mask]) ** 0.5),
+                "raw_MAE_mm": float(mean_absolute_error(y[mask], cv_pred[mask])),
+                "raw_monotonic_violations": monotonic_violations(cv_pred[mask]),
+                "projected_RMSE_mm": float(mean_squared_error(y[projected_mask], projected[projected_mask]) ** 0.5),
+                "projected_MAE_mm": float(mean_absolute_error(y[projected_mask], projected[projected_mask])),
+                "projected_monotonic_violations": monotonic_violations(projected[projected_mask]),
+                "RMSE_mm": float(mean_squared_error(y[projected_mask], projected[projected_mask]) ** 0.5),
+                "MAE_mm": float(mean_absolute_error(y[projected_mask], projected[projected_mask])),
+                "monotonic_violations": monotonic_violations(projected[projected_mask]),
+            }
+        )
+    return pd.DataFrame(rows).sort_values(["RMSE_mm", "MAE_mm"]).reset_index(drop=True)
+
+
 def run() -> dict[str, object]:
     train = read_excel(ATTACHMENTS["q4"], sheet_name="训练集")
     exp = read_excel(ATTACHMENTS["q4"], sheet_name="实验集")
@@ -140,6 +202,8 @@ def run() -> dict[str, object]:
     exp_features, _ = make_disturbance_features(exp, stage=stage_exp, tau=tau_exp)
 
     direct_cv = _direct_cv(train_features, y, stage_train)
+    shrinkage_cv = _residual_shrinkage_cv(train_features, y, stage_train, train_baseline, train_residual)
+    selected_shrinkage = float(shrinkage_cv.iloc[0]["shrinkage"])
 
     exp_pred = exp_baseline.copy()
     residual_models = {}
@@ -159,8 +223,8 @@ def run() -> dict[str, object]:
         residual_stage = residual_stage - residual_stage[0] + current_offset
         # The phase-normalized deformation curve is the physical backbone; residual learning
         # corrects disturbance bias but must not erase the stage's monotone creep growth.
-        stage_pred = baseline_stage + 0.35 * (residual_stage - baseline_stage)
-        stage_pred = np.maximum.accumulate(np.maximum(stage_pred, baseline_stage))
+        stage_pred = baseline_stage + selected_shrinkage * (residual_stage - baseline_stage)
+        stage_pred = _project_stagewise_monotone(stage_pred, lower_bound=baseline_stage)
         exp_pred[exp_idx] = stage_pred
         residual_models[int(label)] = {
             "residual_clip_low": float(lo),
@@ -175,7 +239,7 @@ def run() -> dict[str, object]:
             }
         )
 
-    exp_pred = np.maximum.accumulate(exp_pred)
+    exp_pred = _project_stagewise_monotone(exp_pred)
     target_rows = []
     for target_time in TARGET_TIMES:
         matches = exp.index[exp["时间"].eq(target_time)].to_list()
@@ -225,6 +289,7 @@ def run() -> dict[str, object]:
         "training_transition_rows": [int(b1 + 1), int(b2 + 1)],
         "training_transition_times": [str(train["时间"].iloc[b1]), str(train["时间"].iloc[b2])],
         "direct_cv": direct_cv,
+        "residual_shrinkage": selected_shrinkage,
         "monotonic_violations_experiment": int(np.sum(np.diff(exp_pred) < -1e-9)),
         "target_predictions": target_rows,
         "residual_models": residual_models,
@@ -234,6 +299,7 @@ def run() -> dict[str, object]:
     write_csv(transition_df, TABLE_DIR / "q4_training_transition_nodes.csv")
     write_csv(stage_model_df, TABLE_DIR / "q4_training_stage_models.csv")
     write_csv(baseline_df, TABLE_DIR / "q4_stage_baseline_knots.csv")
+    write_csv(shrinkage_cv, TABLE_DIR / "q4_residual_shrinkage_cv.csv")
     write_csv(residual_metric_df, TABLE_DIR / "q4_residual_model_metrics.csv")
     write_csv(exp_result, TABLE_DIR / "q4_experiment_surface_predictions.csv")
     write_csv(target_df, TABLE_DIR / "q4_table_4_1_predictions.csv")

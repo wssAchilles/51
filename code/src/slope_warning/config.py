@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 
 
@@ -12,6 +13,28 @@ TABLE_DIR = OUTPUT_DIR / "tables"
 FIGURE_DIR = OUTPUT_DIR / "figures"
 MODEL_DIR = OUTPUT_DIR / "models"
 AWARD_DIR = OUTPUT_DIR / "award"
+
+
+RANDOM_SEED = 20260501
+
+
+@dataclass(frozen=True)
+class AuditConfig:
+    """Centralized parameters used by reproducibility and award-level audits."""
+
+    rng_seed: int = RANDOM_SEED
+    q1_huber_delta_grid: tuple[float, ...] = (1.0, 1.2, 1.345, 1.6, 2.0)
+    q1_bootstrap_repeats: int = 250
+    q2_velocity_windows: tuple[int, ...] = (18, 36, 72)
+    q2_weight_grid: tuple[float, ...] = (0.15, 0.25, 0.35, 0.45, 0.55)
+    q3_continuous_threshold_grid: tuple[float, ...] = (3.5, 4.0, 4.5, 5.0, 5.5)
+    q3_sparse_quantile_grid: tuple[float, ...] = (0.995, 0.997, 0.999)
+    q4_residual_shrinkage_grid: tuple[float, ...] = (0.0, 0.2, 0.35, 0.5, 0.65, 0.8, 1.0)
+    q5_warning_windows: tuple[int, ...] = (18, 36, 72)
+    q5_inverse_velocity_window_steps: int = 144
+
+
+AUDIT_CONFIG = AuditConfig()
 
 
 ATTACHMENTS = {

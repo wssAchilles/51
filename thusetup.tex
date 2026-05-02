@@ -241,6 +241,9 @@
 % 1. 定义 R 和 C 列格式 (依赖 array 宏包，已由 tabularx 加载)
 \newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\captionsetup[table]{justification=centering,singlelinecheck=true}
 
 % 2. 定义标题字体 (使用黑体)
 \newcommand{\HeadingFont}{\heiti}

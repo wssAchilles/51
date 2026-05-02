@@ -160,7 +160,7 @@ def figure_problem_relationship():
         ax.text(x + 0.07, 0.455, text, ha="center", va="center", fontsize=9.5, color="#34495E", linespacing=1.20)
         arrow(ax, (x + 0.07, 0.57), (x + 0.07, 0.49), "#9AA7B2", lw=1.2)
 
-    box(ax, (0.13, 0.17), (0.74, 0.16), "贯穿全文的共同约束", "时间块验证避免未来信息泄漏；单调位移约束保证工程含义\n多模型对照与敏感性分析构成防御性证据", "#F7F9FB", "#6B7C8F", title_size=13, sub_size=9.8)
+    box(ax, (0.13, 0.17), (0.74, 0.16), "贯穿全文的共同约束", "时间块验证避免未来信息泄漏；单调位移约束保证工程含义\n多模型对照与敏感性分析形成稳健性证据", "#F7F9FB", "#6B7C8F", title_size=13, sub_size=9.8)
     arrow(ax, (0.69, 0.32), (0.31, 0.57), "#6B7C8F", rad=-0.23)
     arrow(ax, (0.86, 0.57), (0.86, 0.32), "#B84D4D", rad=0.0)
     save(fig, "paper_problem_relationship.png")
@@ -302,22 +302,24 @@ def figure_q3_contribution_bar():
     mean = np.array([r[2] for r in rows])
     std = np.array([r[3] for r in rows])
 
-    fig, ax = plt.subplots(figsize=(8.8, 4.8))
+    fig, ax = plt.subplots(figsize=(9.4, 5.0))
     fig.patch.set_facecolor("white")
     y = np.arange(len(labels))
     colors = ["#87A9D8", "#78B79A", "#E3B35A", "#C97878"]
     ax.barh(y, perm, color=colors[: len(labels)], alpha=0.88, label="置换RMSE增量")
     ax.errorbar(mean, y, xerr=std, fmt="o", color="#263A4A", capsize=4, label="重复划分均值±标准差")
+    label_x = np.maximum(perm + 0.18, mean + std + 0.24)
+    ax.set_xlim(0, float(label_x.max() + 0.55))
     ax.set_yticks(y)
     ax.set_yticklabels(labels, fontsize=11)
     ax.set_xlabel("贡献度 / RMSE增量 (mm)", fontsize=11)
     ax.set_title("问题三变量贡献稳定性对照", fontsize=16, weight="bold", color="#16324F")
     ax.grid(axis="x", alpha=0.22)
-    ax.legend(loc="lower right", frameon=False, fontsize=10)
+    ax.legend(loc="lower right", frameon=False, fontsize=10, borderaxespad=0.8)
     for i, value in enumerate(perm):
-        ax.text(value + 0.15, i, f"{value:.2f}", va="center", fontsize=10, color="#263A4A")
+        ax.text(label_x[i], i, f"{value:.2f}", va="center", ha="left", fontsize=10, color="#263A4A")
     ax.spines[["top", "right"]].set_visible(False)
-    fig.tight_layout()
+    fig.subplots_adjust(left=0.18, right=0.96, top=0.86, bottom=0.16)
     save(fig, "q3_variable_contribution_bar.png")
 
 

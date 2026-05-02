@@ -46,7 +46,9 @@ def hampel_flags(values: np.ndarray, window: int = 37, threshold: float = 4.0, c
     med = series.rolling(window=window, center=center, min_periods=max(3, window // 3)).median()
     resid = series - med
     mad = resid.abs().rolling(window=window, center=center, min_periods=max(3, window // 3)).median()
-    scale = 1.4826 * mad.replace(0, np.nan)
+    scale = 1.4826 * mad
+    fallback_scale = robust_scale(resid.to_numpy())
+    scale = scale.mask((scale <= 1e-12) | ~np.isfinite(scale), fallback_scale)
     score = (resid.abs() / scale).replace([np.inf, -np.inf], np.nan).fillna(0.0)
     flags = score.to_numpy() > threshold
     return flags, med.bfill().ffill().to_numpy(), score.to_numpy()

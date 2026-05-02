@@ -1,0 +1,4 @@
+﻿variable,missing_count_raw,missing_count_after_fill,min_after_preprocess,max_after_preprocess,outlier_count_threshold_4.5
+pore,475,0,46.24,120.78,5
+deep,456,0,13.654759579787,56.228,5
+surface,559,0,62.243,157.777,36

@@ -1,0 +1,3 @@
+﻿transition,main_serial,same_serial_share,median_serial,min_serial,max_serial
+slow_to_accelerated,8108,0.84,8108.0,5290,8473
+accelerated_to_rapid,9501,0.84,9501.0,8871,9567

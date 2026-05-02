@@ -1,8 +1,8 @@
-﻿model,validation_scope,RMSE_mm,MAE_mm,monotonic_violations
-baseline_plus_gbdt_residual,stagewise_training_reconstruction,0.2882583221690686,0.1645391252626529,1828.0
-baseline_plus_linear_residual,stagewise_training_reconstruction,1.1207957285916033,0.5413005575562582,3583.0
-baseline_plus_gbdt_residual_CV,stage_residual_time_block_cv,2.142192551430446,0.8598399256048337,2384.0
-baseline_plus_linear_residual_CV,stage_residual_time_block_cv,3.255649444757687,1.564050872207083,3774.0
-stage_normalized_baseline,training_reconstruction,5.578152190991167,3.388672720618568,
-global_disturbance_direct_CV,time_block_cv,61.34508573850312,42.91298862957749,
-staged_disturbance_direct_CV,stage_time_block_cv,67.21518011328043,19.848354604397286,
+﻿model,validation_scope,RMSE_mm,MAE_mm,monotonic_violations,raw_RMSE_mm,raw_MAE_mm,raw_monotonic_violations,projected_RMSE_mm,projected_MAE_mm,projected_monotonic_violations
+baseline_plus_gbdt_residual,stagewise_training_reconstruction,0.2882583221690686,0.1645391252626529,1828.0,,,,,,
+baseline_plus_linear_residual,stagewise_training_reconstruction,1.1207957285916033,0.5413005575562582,3583.0,,,,,,
+baseline_plus_gbdt_residual_CV,stage_residual_time_block_cv,2.470361051027519,1.5479419935379823,0.0,2.142192551430446,0.8598399256048337,2384.0,2.470361051027519,1.5479419935379823,0.0
+stage_normalized_baseline,training_reconstruction,5.578152190991167,3.388672720618568,0.0,,,,,,
+baseline_plus_linear_residual_CV,stage_residual_time_block_cv,5.80083575667405,4.718087299483389,0.0,3.255649444757687,1.564050872207083,3774.0,5.80083575667405,4.718087299483389,0.0
+global_disturbance_direct_CV,time_block_cv,61.34508573850312,42.91298862957749,,,,,,,
+staged_disturbance_direct_CV,stage_time_block_cv,67.21518011328043,19.848354604397286,,,,,,,

@@ -124,6 +124,7 @@ def _warning_thresholds(time: pd.Series, velocity: np.ndarray, stage: np.ndarray
     stage3 = v6[(stage == 3) & np.isfinite(v6)]
     attention = max(float(np.percentile(stage1, 90)), float(np.percentile(stage2, 50)))
     warning = max(float(np.percentile(stage2, 90)), float(np.percentile(stage3, 10)))
+    warning = max(warning, attention + 0.5)
     severe = max(float(np.percentile(stage3, 25)), warning + 0.5)
     thresholds = pd.DataFrame(
         [
