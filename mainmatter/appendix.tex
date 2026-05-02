@@ -1,13 +1,330 @@
-\chapter{附录：代码复现说明}
+\lstdefinestyle{appendixtxt}{
+    basicstyle=\footnotesize\ttfamily,
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    tabsize=4,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=lines,
+    rulecolor=\color{black}
+}
 
-本文所有结果由统一脚本自动生成，代码目录为\texttt{code/}。基础求解脚本为\texttt{scripts/run\_all.py}，稳健性检验脚本为\texttt{scripts/run\_robustness\_audit.py}。运行方式为：
+\newcommand{\AppendixPyFile}[2]{%
+  \subsection{#1}
+  \lstinputlisting[style=appendixpy]{#2}
+}
 
-\begin{lstlisting}[style=appendixpy]
+\newcommand{\AppendixPyRangeFile}[4]{%
+  \subsection{#1}
+  \lstinputlisting[style=appendixpy, firstline=#3, lastline=#4]{#2}
+}
+
+\newcommand{\AppendixTxtFile}[2]{%
+  \subsection{#1}
+  \lstinputlisting[style=appendixtxt]{#2}
+}
+
+\chapter{代码复现与数据来源说明}
+
+本附录给出论文主要结果的复现方式、附件数据来源、输出文件对应关系以及核心代码清单。附录中的代码均通过\verb|\lstinputlisting|直接从\texttt{code/}目录引用，避免手工复制造成论文附录与实际运行代码不一致。
+
+\section{运行环境与复现命令}
+
+代码目录为\texttt{code/}，Python依赖由\texttt{uv}管理。进入\texttt{code/}目录后，完整复现顺序如下：
+
+\begin{lstlisting}[style=appendixtxt]
 uv run python scripts/run_all.py
-uv run python scripts/run_robustness_audit.py
+uv run python scripts/run_award_audit.py
 uv run python scripts/validate_outputs.py
 uv run python -m compileall src scripts
 uv run pytest
 \end{lstlisting}
 
-主要输出文件包括：\texttt{code/outputs/tables/}中的各题结果表，\texttt{code/outputs/figures/}中的主图，以及扩展检验目录中的模型对照、敏感性分析和置信区间。正文表格均可由这些CSV文件复现，图件均为中文标注，可直接纳入论文。
+其中，\texttt{scripts/run\_all.py}生成五问基础求解结果，\texttt{scripts/run\_award\_audit.py}生成模型对照、敏感性分析和预测区间等增强证据，\texttt{scripts/validate\_outputs.py}检查关键表格、图件和约束条件是否满足。本文编译后正文为29页，参考文献与附录不计入正文页数。
+
+\section{原始附件数据来源}
+
+所有模型输入均来自题目提供的五个附件，路径在\texttt{src/slope\_warning/config.py}中统一配置。表\ref{tab:appendix_data_sources}列出附件与问题的对应关系。
+
+\begin{table}[H]
+\centering
+\small
+\caption{附件数据与建模任务对应关系}
+\label{tab:appendix_data_sources}
+\begin{tabularx}{0.98\textwidth}{L{1.5cm}L{3.0cm}X}
+\toprule
+问题 & 读取对象 & 建模用途 \\
+\midrule
+问题一 & 附件1：两组位移时序数据 & A、B两传感器同步位移校准，输出题目表1.1的5个校正值。 \\
+问题二 & 附件2：位移时序数据 & 识别三阶段转换节点，建立分阶段位移模型并计算平均速度。 \\
+问题三 & 附件3：训练集与实验集 & 训练集缺失补齐、异常识别和贡献排序；实验集表面位移估计。 \\
+问题四 & 附件4：训练集与实验集 & 训练集阶段归一化残差建模；实验集指定时刻表面位移预测。 \\
+问题五 & 附件5：监测数据 & 枚举六选五变量组合，建立速度分级预警机制。 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+需要特别说明的是，附件4和附件5中爆破点距离、单段最大药量的空值表示该时刻无爆破事件，代码在构造爆破冲击特征时将其解释为零强度事件；附件4实验集的表面位移空值为题目要求预测的目标值，不作为普通缺失值补齐。全文没有使用外部生成数据替代附件数据。
+
+\section{主要输出文件}
+
+基础求解结果写入\path{code/outputs/tables/}和\path{code/outputs/models/}；增强审查结果写入\path{code/outputs/award/}；正文图件写入\path{code/outputs/figures/}。关键输出见表\ref{tab:appendix_outputs}。
+
+\begin{table}[H]
+\centering
+\small
+\caption{正文关键表图与输出文件对应关系}
+\label{tab:appendix_outputs}
+\begin{tabularx}{0.98\textwidth}{L{2.1cm}L{5.4cm}X}
+\toprule
+问题 & 关键输出文件 & 对应正文内容 \\
+\midrule
+问题一 & \path{q1_table_1_1.csv}，\path{q1_model_comparison.csv}，\path{q1_bootstrap_correction_ci.csv} & 校准模型对照、5个待校正值、bootstrap置信区间。 \\
+问题二 & \path{q2_final_transition_decision.csv}，\path{q2_final_stage_models.csv}，\path{q2_transition_candidate_comparison.csv} & 复合证据主节点、候选节点解释、分阶段位移模型。 \\
+问题三 & \path{q3_table_3_1_single_variable_anomalies.csv}，\path{q3_table_3_2_common_anomalies.csv}，\path{q3_experiment_surface_predictions.csv} & 异常点统计、共同异常清单、实验集表面位移估计。 \\
+问题四 & \path{q4_table_4_1_predictions.csv}，\path{q4_table_4_1_prediction_intervals.csv}，\path{q4_ablation_comparison.csv} & 指定时刻预测值、95\%预测区间、模型消融对照。 \\
+问题五 & \path{q5_variable_combination_cv.csv}，\path{q5_warning_thresholds.csv}，\path{q5_warning_events.csv} & 六选五组合评价、三级阈值、预警事件时间线。 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+问题二同时保留了速度水平跃迁的基线输出\path{q2_transition_nodes.csv}，用于与复合证据节点对照。正文采用\path{outputs/award/}中的复合证据主节点：第8108号和第9501号；速度跃迁点第8473号作为第一阶段转换的辅助证据，而非正文最终阶段起点。
+
+\chapter{关键结果附表}
+
+本章摘录正文未完全展开但对复核较重要的CSV结果。完整文件仍以\path{code/outputs/}目录中的CSV为准；附表仅保留题目交付、模型选择和预警机制复核所需的关键字段，避免把数千行实验集预测全部堆入正文。
+
+\section{问题二复合证据节点输出}
+
+表\ref{tab:appendix_q2_decision}摘自\path{outputs/award/q2_final_transition_decision.csv}，用于明确正文采用的主阶段节点。表\ref{tab:appendix_q2_candidates}摘自\path{outputs/award/q2_transition_candidate_comparison.csv}，用于说明主节点不是单一算法输出，而是由位移趋势、持续加速度和速度跃迁共同给出。
+
+\begin{table}[H]
+\centering
+\small
+\caption{问题二复合证据最终阶段节点}
+\label{tab:appendix_q2_decision}
+\begin{tabularx}{0.96\textwidth}{L{2.8cm}L{1.5cm}L{3.1cm}L{2.1cm}L{2.1cm}}
+\toprule
+转换 & 主节点 & 时间 & 位移/mm & 6 h速度/mm/h \\
+\midrule
+缓慢$\to$加速 & 8108 & 2024-06-29 07:10 & 353.923 & 0.636 \\
+加速$\to$快速 & 9501 & 2024-07-08 23:20 & 785.711 & 2.781 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{问题二复合证据候选节点}
+\label{tab:appendix_q2_candidates}
+\begin{tabularx}{0.98\textwidth}{L{2.1cm}L{2.5cm}L{1.3cm}L{1.2cm}L{2.7cm}X}
+\toprule
+转换 & 证据类型 & 编号 & 权重 & 时间 & 解释 \\
+\midrule
+缓慢$\to$加速 & 位移趋势变化 & 5290 & 0.20 & 06-09 17:30 & 分段位移拟合误差最优，反映累计趋势开始偏离。 \\
+缓慢$\to$加速 & 持续加速度起点 & 8108 & 0.35 & 06-29 07:10 & 6 h速度连续12 h高于基线阈值，具有提前预警意义。 \\
+缓慢$\to$加速 & 速度水平跃迁 & 8473 & 0.45 & 07-01 20:00 & 速度水平分段最优，反映状态显著跃迁。 \\
+加速$\to$快速 & 位移趋势变化 & 8871 & 0.25 & 07-04 14:20 & 分段位移拟合误差最优。 \\
+加速$\to$快速 & 快速速度持续 & 9567 & 0.25 & 07-09 10:20 & 速度越过加速段与快速段中位水平并持续。 \\
+加速$\to$快速 & 速度水平跃迁 & 9501 & 0.50 & 07-08 23:20 & 速度水平分段最优。 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{问题三实验集表面位移估计节选}
+
+附件3实验集共有5001行预测结果，完整输出见\path{outputs/tables/q3_experiment_surface_predictions.csv}。表\ref{tab:appendix_q3_exp_pred}摘录前20个编号，用于说明实验集表面位移估计结果已经由脚本逐行生成，而非只给出散点图。
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{问题三实验集表面位移预测结果节选}
+\label{tab:appendix_q3_exp_pred}
+\begingroup
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}L{0.9cm}L{1.55cm}L{0.9cm}L{1.55cm}L{0.9cm}L{1.55cm}L{0.9cm}L{1.55cm}@{}}
+\toprule
+编号 & 预测值/mm & 编号 & 预测值/mm & 编号 & 预测值/mm & 编号 & 预测值/mm \\
+\midrule
+1 & 82.441 & 6 & 79.733 & 11 & 116.909 & 16 & 81.672 \\
+2 & 87.621 & 7 & 81.508 & 12 & 88.599 & 17 & 101.727 \\
+3 & 84.908 & 8 & 81.508 & 13 & 89.010 & 18 & 103.902 \\
+4 & 86.046 & 9 & 81.092 & 14 & 88.158 & 19 & 90.277 \\
+5 & 82.302 & 10 & 81.156 & 15 & 89.576 & 20 & 91.829 \\
+\bottomrule
+\end{tabular}
+\endgroup
+\end{table}
+
+\section{问题四指定时刻预测区间}
+
+表\ref{tab:appendix_q4_intervals}摘自\path{outputs/award/q4_table_4_1_prediction_intervals.csv}。正文表4.1给出同一组结果，本附表保留实验集行号和区间半宽，便于复核指定时刻是否准确命中附件4实验集。
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{问题四指定时刻预测值、区间与实验集行号}
+\label{tab:appendix_q4_intervals}
+\begingroup
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{0.98\textwidth}{@{}L{2.8cm}L{1.2cm}L{0.9cm}L{1.7cm}L{2.8cm}L{1.4cm}@{}}
+\toprule
+时间点 & 行号 & 阶段 & 预测值/mm & 95\%预测区间/mm & 半宽/mm \\
+\midrule
+2025-05-09 12:00 & 1125 & 1 & 5.163 & [4.531,\;5.795] & 0.632 \\
+2025-05-27 08:00 & 3693 & 2 & 33.594 & [24.085,\;43.102] & 9.509 \\
+2025-06-01 12:00 & 4437 & 2 & 61.934 & [52.425,\;71.443] & 9.509 \\
+2025-06-03 22:00 & 4785 & 3 & 384.971 & [368.908,\;401.034] & 16.063 \\
+2025-06-04 01:40 & 4807 & 3 & 385.482 & [369.419,\;401.546] & 16.063 \\
+\bottomrule
+\end{tabularx}
+\endgroup
+\end{table}
+
+\section{问题五五变量组合完整排序}
+
+正文表7.1展示了主要组合。为满足“枚举全部六选五变量组合”的复核需要，表\ref{tab:appendix_q5_combo_full}列出完整六组结果，数据摘自\path{outputs/tables/q5_variable_combination_cv.csv}和\path{outputs/award/q5_consensus_conflict_analysis.csv}。保留变量列使用题中变量名称，综合得分越小表示排序越优。
+
+\begin{table}[H]
+\centering
+\scriptsize
+\caption{问题五六种五变量组合完整排序}
+\label{tab:appendix_q5_combo_full}
+\begingroup
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{0.99\textwidth}{@{}L{5.0cm}L{1.6cm}L{1.8cm}L{2.0cm}L{1.3cm}@{}}
+\toprule
+保留变量 & 剔除变量 & GBDT位移RMSE/mm & ElasticNet位移RMSE/mm & 综合得分 \\
+\midrule
+降雨量、孔隙水压力、微震事件数、爆破点距离、单段最大药量 & 干湿入渗系数 & 21.899 & 180.655 & 4.45 \\
+降雨量、孔隙水压力、微震事件数、干湿入渗系数、爆破点距离 & 单段最大药量 & 27.399 & 155.954 & 5.35 \\
+降雨量、孔隙水压力、微震事件数、干湿入渗系数、单段最大药量 & 爆破点距离 & 29.951 & 155.952 & 5.95 \\
+孔隙水压力、微震事件数、干湿入渗系数、爆破点距离、单段最大药量 & 降雨量 & 25.714 & 181.388 & 7.05 \\
+降雨量、微震事件数、干湿入渗系数、爆破点距离、单段最大药量 & 孔隙水压力 & 94.221 & 101.589 & 7.20 \\
+降雨量、孔隙水压力、干湿入渗系数、爆破点距离、单段最大药量 & 微震事件数 & 215.137 & 247.018 & 12.00 \\
+\bottomrule
+\end{tabularx}
+\endgroup
+\end{table}
+
+由表\ref{tab:appendix_q5_combo_full}可见，剔除干湿入渗系数的组合在GBDT位移积分误差上优势明显，虽然ElasticNet对孔隙水压力组合更敏感，但综合非线性拟合和工程解释后，最终选择仍与正文一致。
+
+\section{问题五预警事件汇总}
+
+表\ref{tab:appendix_q5_warning_summary}摘自\path{outputs/award/q5_warning_event_summary.csv}。完整事件时间段见\path{outputs/tables/q5_warning_events.csv}。
+
+\begin{table}[H]
+\centering
+\small
+\caption{问题五三级预警事件汇总}
+\label{tab:appendix_q5_warning_summary}
+\begingroup
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{0.96\textwidth}{@{}L{2.0cm}L{1.3cm}L{2.1cm}L{2.1cm}L{3.0cm}@{}}
+\toprule
+等级 & 事件数 & 总持续时间/h & 最大速度/mm/h & 首次触发时间 \\
+\midrule
+关注 & 7 & 322.167 & 10.115 & 2024-01-17 04:00 \\
+预警 & 2 & 184.167 & 10.115 & 2024-02-01 08:10 \\
+严重预警 & 9 & 110.500 & 10.115 & 2024-02-01 12:20 \\
+\bottomrule
+\end{tabularx}
+\endgroup
+\end{table}
+
+\chapter{核心代码摘录与完整代码位置}
+
+本章只列出与模型复现和关键算法直接相关的核心代码片段。完整工程代码不在附录中逐文件展开，均保存在\path{code/}目录；基础结果由\path{scripts/run_all.py}生成，增强审查由\path{scripts/run_award_audit.py}生成，输出一致性由\path{scripts/validate_outputs.py}检查。
+
+\section{复现入口与输出校验}
+
+五个问题由统一入口顺序运行，所有主结果写入\path{outputs/tables/}、\path{outputs/models/}和\path{outputs/figures/}。输出校验脚本检查关键CSV、图件、无缺失、非负约束、问题四单调性以及问题五阈值递增性。
+
+\AppendixPyRangeFile{五问统一求解入口}{code/scripts/run_all.py}{18}{32}
+\AppendixPyRangeFile{关键输出一致性校验}{code/scripts/validate_outputs.py}{72}{116}
+
+\section{问题一：Huber稳健仿射校准}
+
+问题一的核心在于用IRLS求解Huber稳健仿射模型，降低异常同步观测点对传感器校准的影响。
+
+\AppendixPyRangeFile{Huber-IRLS校准函数}{code/src/slope_warning/questions/q1_calibration.py}{14}{39}
+
+\section{问题二：速度主导阶段识别}
+
+问题二以Hampel清洗后的6 h滚动中位速度作为主证据，再用两断点分段和位移分段拟合交叉验证阶段节点。
+
+\AppendixPyRangeFile{速度清洗、两断点识别与阶段拟合}{code/src/slope_warning/questions/q2_segmentation.py}{25}{38}
+\AppendixPyRangeFile{阶段转换判别准则输出}{code/src/slope_warning/questions/q2_segmentation.py}{71}{89}
+
+\section{问题三：连续状态量与稀疏驱动量分治}
+
+问题三将孔压、深部位移、表面位移作为连续状态量补齐和诊断，将降雨量、微震事件数作为稀疏驱动量保留真实峰值，再用分组置换重要性解释变量贡献。
+
+\AppendixPyRangeFile{多源变量预处理与异常标记}{code/src/slope_warning/questions/q3_fusion.py}{55}{108}
+\AppendixPyRangeFile{分组置换重要性计算}{code/src/slope_warning/questions/q3_fusion.py}{139}{153}
+
+\section{问题四：阶段归一化基线与残差收缩}
+
+问题四先对每个阶段建立单调PCHIP基线，再用扰动残差模型修正局部偏差，并通过时间块交叉验证选择残差收缩系数，最后进行单调投影。
+
+\AppendixPyRangeFile{阶段归一化时间与PCHIP基线}{code/src/slope_warning/questions/q4_prediction.py}{31}{78}
+\AppendixPyRangeFile{单调投影和残差收缩交叉验证}{code/src/slope_warning/questions/q4_prediction.py}{122}{177}
+
+\section{问题五：变量组合筛选与三级预警}
+
+问题五用全部六选五组合进行模型比较，并在速度序列上叠加持续时间条件形成三级预警事件。
+
+\AppendixPyRangeFile{五变量组合时间块验证}{code/src/slope_warning/questions/q5_warning.py}{53}{79}
+\AppendixPyRangeFile{三级阈值与持续事件提取}{code/src/slope_warning/questions/q5_warning.py}{81}{173}
+
+\section{完整代码文件索引}
+
+为避免附录无限展开，增强审查、图件生成和测试代码仍以文件索引方式给出：\path{code/src/slope_warning/award/}保存模型对照、bootstrap、敏感性、预测区间和逆速度预警等增强审查；\path{code/scripts/make_paper_diagrams.py}保存论文图件生成脚本；\path{code/tests/}保存单元测试。上述文件均可由附录A中的复现命令直接调用。
+
+\chapter{分问题主求解脚本}
+
+本章列出问题一至问题五的主求解脚本。与前一章的核心片段不同，本章保留完整执行逻辑，便于复核每一问从附件读取、模型求解到CSV和图件输出的全过程。
+
+\section{问题一：稳健传感器校准}
+
+\AppendixPyFile{问题一主脚本 \texttt{q1\_calibration.py}}{code/src/slope_warning/questions/q1_calibration.py}
+
+\section{问题二：速度主导阶段识别}
+
+\AppendixPyFile{问题二主脚本 \texttt{q2\_segmentation.py}}{code/src/slope_warning/questions/q2_segmentation.py}
+
+\section{问题三：多源补齐、异常识别与贡献分析}
+
+\AppendixPyFile{问题三主脚本 \texttt{q3\_fusion.py}}{code/src/slope_warning/questions/q3_fusion.py}
+
+\section{问题四：阶段归一化残差预测}
+
+\AppendixPyFile{问题四主脚本 \texttt{q4\_prediction.py}}{code/src/slope_warning/questions/q4_prediction.py}
+
+\section{问题五：变量筛选与速度预警}
+
+\AppendixPyFile{问题五主脚本 \texttt{q5\_warning.py}}{code/src/slope_warning/questions/q5_warning.py}
+
+\chapter{公共预处理、分段与特征模块}
+
+本章列出被多个问题复用的公共模块。保留这些模块可以说明全文并非每问各自临时处理数据，而是在统一时间索引、统一滚动窗口、统一评价指标和统一特征构造框架下完成建模。
+
+\section{预处理模块}
+
+\AppendixPyFile{缺失补齐、Hampel规则与滚动窗口 \texttt{preprocessing.py}}{code/src/slope_warning/common/preprocessing.py}
+
+\section{分段与阶段拟合模块}
+
+\AppendixPyFile{两断点搜索与分阶段拟合 \texttt{segmentation.py}}{code/src/slope_warning/common/segmentation.py}
+
+\section{特征构造模块}
+
+\AppendixPyFile{窗口特征、扰动特征与六选五组合 \texttt{features.py}}{code/src/slope_warning/common/features.py}
+
+\section{指标与诊断模块}
+
+\AppendixPyFile{评价指标与时间块划分 \texttt{metrics.py}}{code/src/slope_warning/common/metrics.py}
+\AppendixPyFile{单调性与残差诊断 \texttt{diagnostics.py}}{code/src/slope_warning/common/diagnostics.py}

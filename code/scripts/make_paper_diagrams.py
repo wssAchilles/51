@@ -343,7 +343,7 @@ def figure_model_sensitivity_summary():
         focus.append(first_float(stage1, "q90"))
         severe.append(first_float(stage3, "q50", "q75", "q90"))
 
-    fig, axes = plt.subplots(1, 2, figsize=(10.2, 4.5))
+    fig, axes = plt.subplots(1, 2, figsize=(11.2, 4.6))
     fig.patch.set_facecolor("white")
     ax = axes[0]
     x = np.arange(len(windows))
@@ -354,7 +354,7 @@ def figure_model_sensitivity_summary():
     ax.set_ylabel("节点编号")
     ax.set_title("阶段识别窗口敏感性", fontsize=13, weight="bold")
     ax.grid(axis="y", alpha=0.22)
-    ax.legend(frameon=False, fontsize=9)
+    ax.legend(frameon=False, fontsize=9, loc="center right")
     ax.spines[["top", "right"]].set_visible(False)
 
     ax = axes[1]
@@ -366,12 +366,13 @@ def figure_model_sensitivity_summary():
     ax.set_xticklabels(q5_windows)
     ax.set_ylabel("速度 (mm/h)")
     ax.set_title("预警阈值窗口敏感性", fontsize=13, weight="bold")
+    ax.set_ylim(0, max(severe) * 1.12)
     ax.grid(axis="y", alpha=0.22)
-    ax.legend(frameon=False, fontsize=9)
+    ax.legend(frameon=False, fontsize=9, loc="center left", bbox_to_anchor=(1.02, 0.72), borderaxespad=0.0)
     ax.spines[["top", "right"]].set_visible(False)
 
     fig.suptitle("模型关键参数敏感性汇总", fontsize=16, weight="bold", color="#16324F")
-    fig.tight_layout(rect=(0, 0, 1, 0.92))
+    fig.tight_layout(rect=(0, 0, 0.88, 0.92))
     save(fig, "model_sensitivity_summary.png")
 
 
