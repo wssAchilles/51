@@ -64,6 +64,29 @@ Theil--Sen & -0.380 & 0.8817 & 3.932 & 2.787 & 8.567 \\
 \end{tabular}
 \end{table}
 
+Huber阈值$\delta$控制从二次损失转为线性损失的位置。为避免主模型依赖单一阈值，本文在
+$\{1.0,1.2,1.345,1.6,2.0\}\sigma$上进行敏感性检查，结果见表\ref{tab:q1_delta_sensitivity}。
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{问题一Huber阈值敏感性}
+\label{tab:q1_delta_sensitivity}
+\begin{tabular}{L{1.7cm}L{1.7cm}L{1.7cm}L{2.1cm}L{2.1cm}L{2.2cm}}
+\toprule
+$\delta$尺度 & $\hat\beta_0$ & $\hat\beta_1$ & CV RMSE/mm & CV MAE/mm & CV P95AE/mm \\
+\midrule
+$1.000\sigma$ & -0.529 & 0.8817 & 2.684 & 1.289 & 7.219 \\
+$1.200\sigma$ & -0.528 & 0.8817 & 2.684 & 1.289 & 7.219 \\
+$1.345\sigma$ & -0.526 & 0.8817 & 2.684 & 1.289 & 7.219 \\
+$1.600\sigma$ & -0.524 & 0.8817 & 2.684 & 1.290 & 7.218 \\
+$2.000\sigma$ & -0.519 & 0.8817 & 2.684 & 1.290 & 7.218 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+表\ref{tab:q1_delta_sensitivity}显示，阈值在上述范围内变化时，CV MAE均稳定在1.289--1.290 mm，斜率也保持在0.8817附近。这说明校准结论由两传感器的线性量测关系决定，而非由某一个Huber阈值偶然决定。
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.88\textwidth]{q1_calibration_diagnostics.png}
@@ -73,7 +96,7 @@ Theil--Sen & -0.380 & 0.8817 & 3.932 & 2.787 & 8.567 \\
 
 图\ref{fig:q1_diag}显示，校准曲线与两传感器散点的主趋势一致，残差分布以零为中心，仅存在少量尾部误差。因此一次稳健仿射模型足以完成校准。
 
-从模型选择角度看，OLS与Huber的RMSE接近，说明两组传感器关系本身近似线性；但Huber的MAE更低，说明其对大残差点更稳。Theil--Sen在交叉验证中误差明显增大，表明在本数据量和噪声结构下过度依赖秩统计斜率会损失效率。RANSAC虽然表现接近Huber，但其结果依赖内点阈值，参数解释不如Huber连续稳定。因此最终采用Huber作为主模型。
+从模型选择角度看，OLS与Huber的RMSE接近，说明两组传感器关系本身近似线性；但Huber的MAE更低，说明其对大残差点更稳。Theil--Sen在交叉验证中误差明显增大，表明在本数据量和噪声结构下过度依赖秩统计斜率会损失效率。RANSAC虽然表现接近Huber，斜率差异仅约0.0004、MAE差异约0.011 mm，但其结果依赖内点阈值，参数解释不如Huber连续稳定。因此最终采用Huber作为主模型。
 
 \section{结果展示与解释}
 

@@ -18,7 +18,35 @@
 \begin{equation}
   J_c(S)=0.65R_G(S)+0.35R_E(S).
 \end{equation}
-其中GBDT权重较高，是因为问题三和问题四均表明边坡位移对孔压、降雨和爆破扰动存在明显非线性响应；ElasticNet用于保留线性稳定性约束，防止变量选择完全受单一树模型影响。0.65/0.35的比例体现“非线性预测性能优先、线性稳定性校核”的原则，附录表\ref{tab:appendix_q5_combo_full}同时列出两类模型下的位移误差，用于复核模型排序差异。
+其中GBDT权重较高，是因为问题三和问题四均表明边坡位移对孔压、降雨和爆破扰动存在明显非线性响应；ElasticNet用于保留线性稳定性约束，防止变量选择完全受单一树模型影响。0.65/0.35的比例体现“非线性预测性能优先、线性稳定性校核”的原则，\hyperref[tab:appendix_q5_combo_full]{附录表\ref*{tab:appendix_q5_combo_full}}同时列出两类模型下的位移误差，用于复核模型排序差异。
+
+为检查权重选择是否改变最终变量组合，本文令
+\begin{equation}
+  J_w(S)=wR_G(S)+(1-w)R_E(S),
+\end{equation}
+并在$w=0.50$至$0.80$之间做敏感性分析。表\ref{tab:q5_weight_sensitivity}由\hyperref[tab:appendix_q5_consensus_rank]{附录表\ref*{tab:appendix_q5_consensus_rank}}中的两类稳定性名次直接加权得到，不重新训练模型。
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{问题五共识权重敏感性}
+\label{tab:q5_weight_sensitivity}
+\begin{tabularx}{0.96\textwidth}{L{1.8cm}L{6.2cm}L{2.0cm}}
+\toprule
+GBDT权重$w$ & 最优剔除变量 & 最小得分 \\
+\midrule
+0.50 & 单段最大药量、干湿入渗系数、爆破点距离 & 5.50 \\
+0.55 & 干湿入渗系数 & 5.15 \\
+0.60 & 干湿入渗系数 & 4.80 \\
+0.65 & 干湿入渗系数 & 4.45 \\
+0.70 & 干湿入渗系数 & 4.10 \\
+0.75 & 干湿入渗系数 & 3.75 \\
+0.80 & 干湿入渗系数 & 3.40 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+表\ref{tab:q5_weight_sensitivity}表明，当两类模型完全等权时存在三个并列组合；一旦非线性模型权重略高于线性校核，即$w\geq0.55$，最优组合均为剔除干湿入渗系数。故本文取$w=0.65$不会改变最终变量选择方向，而是使变量筛选更符合边坡扰动响应的非线性特征。
 
 表\ref{tab:q5_varselect}给出综合排序。GBDT模型更重视位移曲线的非线性拟合，ElasticNet更强调速度趋势的线性稳定性。综合两类模型后，剔除干湿入渗系数的组合排名第一。
 
@@ -122,6 +150,26 @@
 \end{figure}
 
 图\ref{fig:q5_warning_timeline}显示，关注阈值可在进入快速阶段前给出持续提示，预警和严重预警则随着速度斜率抬升集中触发。与只使用单次超阈值相比，本文预警机制要求“速度超阈值+持续时间+扰动增强+逆速度下降”共同成立，可减少孤立误报。
+
+以表\ref{tab:q5_stage}中的第一阶段转换时刻2024-02-03 02:50为参照，三级预警首次触发时间见表\ref{tab:q5_warning_leadtime}。关注状态提前约406.83 h给出长期提示，预警和严重预警分别提前42.67 h和38.50 h触发，说明预警机制不是对快速阶段的事后标记，而是在阶段转换前已经给出分级信号。
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{问题五预警首次触发提前量}
+\label{tab:q5_warning_leadtime}
+\begin{tabular}{L{2.0cm}L{3.3cm}L{2.8cm}L{1.6cm}}
+\toprule
+等级 & 首次触发时间 & 相对第一转换提前量/h & 事件数 \\
+\midrule
+关注 & 2024-01-17 04:00 & 406.83 & 7 \\
+预警 & 2024-02-01 08:10 & 42.67 & 2 \\
+严重预警 & 2024-02-01 12:20 & 38.50 & 9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+逆速度窗口自身也给出提前量证据：\hyperref[tab:appendix_q5_inverse_leadtime]{附录表\ref*{tab:appendix_q5_inverse_leadtime}}显示，阶段1、阶段2和阶段3的外推提前量中位数分别为12.96 h、5.40 h和2.83 h。随着变形阶段推进，逆速度提前量缩短，与风险逐步临近的工程含义一致。
 
 \begin{figure}[H]
 \centering
