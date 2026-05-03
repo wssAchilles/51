@@ -74,7 +74,7 @@ $\lambda$ & 投影后RMSE/mm & 投影后MAE/mm & 单调违背数 \\
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.98\textwidth]{q4_stage_residual_model.png}
-\caption{问题四阶段基线与扰动残差模型结构}
+\caption{问题四阶段基线与扰动残差模型结构（AI辅助润色绘制，见参考文献\protect\citep{openai_chatgpt_image2_2026}）}
 \label{fig:q4_model_structure}
 \end{figure}
 
@@ -103,10 +103,10 @@ $\lambda$ & 投影后RMSE/mm & 投影后MAE/mm & 单调违背数 \\
 
 实验集从首时刻相对位移开始递推，按给定阶段标签计算$\tau$并代入分阶段模型。表\ref{tab:q4_prediction}给出5个指定时刻的预测值和近似95\%经验预测区间。区间宽度在快速阶段明显增大，反映出快速形变阶段的残差不确定性更高。
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \small
-\caption{实验集指定时刻表面位移预测（题目表4.1）}
+\caption{实验集指定时刻表面位移预测（题 目表4.1）}
 \label{tab:q4_prediction}
 \begin{tabular}{llll}
 \toprule

@@ -26,6 +26,44 @@
   \lstinputlisting[style=appendixtxt]{#2}
 }
 
+\chapter{AI工具使用详情}
+
+本附录依据《2026年五一数学建模竞赛人工智能工具使用规定》说明本文中AI工具的使用范围。本文核心建模思路、附件数据处理、参数选择、数值计算结果和论文结论均由参赛队基于题目附件与可复现代码确定；AI工具仅用于部分流程示意图的视觉润色和重新绘制，不用于生成或替换题目附件数据，也不用于决定模型参数和题目交付数值。
+
+\section{工具名称、版本与使用环节}
+
+本文使用的AI工具为ChatGPT，版本/型号为chatgpt-image-2，开发机构为OpenAI，使用日期为2026年5月3日，参考文献按竞赛规定列出为参考文献第1条。
+
+使用环节限定为论文中若干建模流程图和机制示意图的视觉表达优化。被AI辅助润色绘制并在正文采纳的图件包括：各问题关系图、总体建模路线图、数据预处理与特征构造流程图、问题四阶段基线与扰动残差模型结构图、问题五三级预警闭环流程图；另生成问题二复合证据融合示意图作为备选图件，正文最终未启用。上述图件的节点含义、模型关系、文字内容和逻辑方向均由本文建模方案事先确定，AI仅参与图形排版、配色、边框、箭头和文字布局的视觉重绘。
+
+\section{使用原因与人工修改}
+
+初稿曾尝试使用TikZ直接绘制中文流程图，但在编译后的PDF中出现过文字压缩、框内文字溢出、箭头与节点贴合过近、局部元素重叠以及页面比例不协调等视觉偏差。由于这些图件承担的是“解释模型结构和问题关系”的作用，若版式不清晰，容易影响读者对建模证据链的理解。
+
+因此，本文采用“人工确定内容--AI辅助润色--人工复核采纳”的流程：先由参赛队手工确定图件草稿、节点层级、中文说明和模型含义，再使用ChatGPT内置的chatgpt-image-2模型对图件进行学术化视觉润色和重新绘制。生成后逐张进行人工视觉复核，重点检查非白内容是否完整保留、框中文字是否出界、箭头是否压字、元素是否明显重叠、四周留白是否合理。未通过复核的图件不进入论文。
+
+\section{关键交互记录}
+
+图\ref{fig:ai_record_request}和图\ref{fig:ai_record_result}给出本次AI辅助绘图的关键对话记录。对话记录显示，AI使用请求限定在图件重绘和像素级复核，未要求AI生成建模数据、替代计算结果或改写模型结论。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.96\textwidth]{codex_1.png}
+\caption{AI辅助图件重绘的关键请求记录}
+\label{fig:ai_record_request}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.96\textwidth]{codex_2.png}
+\caption{AI辅助图件生成与人工复核结果记录}
+\label{fig:ai_record_result}
+\end{figure}
+
+\section{采纳范围说明}
+
+正文中凡采用AI辅助润色绘制的图件，均已在图题中标注“AI辅助润色绘制”并引用参考文献第1条。数据驱动图、模型结果表、预测值、异常点清单、阶段节点、预警阈值和附录代码均来自附件数据与可复现程序，不属于AI生成内容。
+
 \chapter{代码复现与数据来源说明}
 
 本附录给出论文主要结果的复现方式、附件数据来源、输出文件对应关系以及核心代码清单。附录中的代码均通过\verb|\lstinputlisting|直接从\texttt{code/}目录引用，避免手工复制造成论文附录与实际运行代码不一致。
@@ -333,9 +371,9 @@ $\lambda$ & 原始RMSE/mm & 原始MAE/mm & 投影后RMSE/mm & 投影后MAE/mm \\
 \end{tabular}
 \end{table}
 
-\chapter{核心代码摘录与完整代码位置}
+\chapter{核心代码摘录}
 
-本章只列出与模型复现和关键算法直接相关的核心代码片段。完整工程代码不在附录中逐文件展开，均保存在\path{code/}目录；基础结果由\path{scripts/run_all.py}生成，增强审查由\path{scripts/run_award_audit.py}生成，输出一致性由\path{scripts/validate_outputs.py}检查。
+本章先列出与模型复现和关键算法直接相关的核心代码片段，便于读者快速定位五个问题的主要求解逻辑。后续附录章节进一步给出完整源程序文件，包括主求解脚本、公共模块、增强审查模块、图件生成脚本、配置文件和测试入口，以满足PDF内复核代码完整性的要求。
 
 \section{复现入口与输出校验}
 
@@ -377,10 +415,6 @@ $\lambda$ & 原始RMSE/mm & 原始MAE/mm & 投影后RMSE/mm & 投影后MAE/mm \\
 
 \AppendixPyRangeFile{五变量组合时间块验证}{code/src/slope_warning/questions/q5_warning.py}{53}{79}
 \AppendixPyRangeFile{三级阈值与持续事件提取}{code/src/slope_warning/questions/q5_warning.py}{81}{173}
-
-\section{完整代码文件索引}
-
-为避免附录无限展开，增强审查、图件生成和测试代码仍以文件索引方式给出：\path{code/src/slope_warning/award/}保存模型对照、bootstrap、敏感性、预测区间和逆速度预警等增强审查；\path{code/scripts/make_paper_diagrams.py}保存论文图件生成脚本；\path{code/tests/}保存单元测试。上述文件均可由附录A中的复现命令直接调用。
 
 \chapter{分问题主求解脚本}
 
@@ -426,3 +460,55 @@ $\lambda$ & 原始RMSE/mm & 原始MAE/mm & 投影后RMSE/mm & 投影后MAE/mm \\
 
 \AppendixPyFile{评价指标与时间块划分 \texttt{metrics.py}}{code/src/slope_warning/common/metrics.py}
 \AppendixPyFile{单调性与残差诊断 \texttt{diagnostics.py}}{code/src/slope_warning/common/diagnostics.py}
+
+\section{数据读取与图件公共模块}
+
+\AppendixPyFile{附件读取与输出目录管理 \texttt{io.py}}{code/src/slope_warning/common/io.py}
+\AppendixPyFile{论文图件绘制公共函数 \texttt{plotting.py}}{code/src/slope_warning/common/plotting.py}
+
+\chapter{配置、运行入口与测试脚本}
+
+本章列出工程配置、统一运行入口、输出校验、图件生成和测试脚本。至此，论文主结果、增强审查结果和图件均可由PDF中列出的代码复现；依赖环境由\texttt{pyproject.toml}说明。
+
+\section{依赖配置与路径配置}
+
+\AppendixTxtFile{Python依赖配置 \texttt{pyproject.toml}}{code/pyproject.toml}
+\AppendixPyFile{附件路径与输出目录配置 \texttt{config.py}}{code/src/slope_warning/config.py}
+\AppendixPyFile{包初始化文件 \texttt{\_\_init\_\_.py}}{code/src/slope_warning/__init__.py}
+\AppendixPyFile{问题模块初始化文件 \texttt{questions/\_\_init\_\_.py}}{code/src/slope_warning/questions/__init__.py}
+\AppendixPyFile{公共模块初始化文件 \texttt{common/\_\_init\_\_.py}}{code/src/slope_warning/common/__init__.py}
+
+\section{运行入口与输出校验}
+
+\AppendixPyFile{五问统一运行脚本 \texttt{run\_all.py}}{code/scripts/run_all.py}
+\AppendixPyFile{特等奖增强审查入口 \texttt{run\_award\_audit.py}}{code/scripts/run_award_audit.py}
+\AppendixPyFile{稳健性审查入口 \texttt{run\_robustness\_audit.py}}{code/scripts/run_robustness_audit.py}
+\AppendixPyFile{输出一致性校验脚本 \texttt{validate\_outputs.py}}{code/scripts/validate_outputs.py}
+\AppendixPyFile{论文图件生成脚本 \texttt{make\_paper\_diagrams.py}}{code/scripts/make_paper_diagrams.py}
+
+\section{单元测试}
+
+\AppendixPyFile{公共流程单元测试 \texttt{test\_common\_pipeline.py}}{code/tests/test_common_pipeline.py}
+
+\chapter{增强审查完整代码}
+
+本章列出模型质量审查与稳健性分析所用的完整代码。增强审查不改变题目主结果，而是生成模型对照、bootstrap区间、敏感性分析、预测区间、变量组合稳定性和逆速度提前量等证据，用于支撑正文中的模型评价和附录结果表。
+
+\section{增强审查入口与兼容封装}
+
+\AppendixPyFile{增强审查统一封装 \texttt{award\_audit.py}}{code/src/slope_warning/award_audit.py}
+\AppendixPyFile{增强审查包初始化 \texttt{award/\_\_init\_\_.py}}{code/src/slope_warning/award/__init__.py}
+
+\section{增强审查公共函数}
+
+\AppendixPyFile{增强审查公共工具 \texttt{award/common.py}}{code/src/slope_warning/award/common.py}
+
+\section{分问题增强审查}
+
+\AppendixPyFile{问题一模型对照与bootstrap审查 \texttt{award/q1.py}}{code/src/slope_warning/award/q1.py}
+\AppendixPyFile{问题二复合证据与节点敏感性审查 \texttt{award/q2.py}}{code/src/slope_warning/award/q2.py}
+\AppendixPyFile{问题三异常阈值与变量贡献审查 \texttt{award/q3.py}}{code/src/slope_warning/award/q3.py}
+\AppendixPyFile{问题四消融、收缩与预测区间审查 \texttt{award/q4.py}}{code/src/slope_warning/award/q4.py}
+\AppendixPyFile{问题五变量筛选与预警提前量审查 \texttt{award/q5.py}}{code/src/slope_warning/award/q5.py}
+
+
